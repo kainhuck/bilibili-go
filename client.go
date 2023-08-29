@@ -12,24 +12,23 @@ import (
 	"time"
 )
 
-const (
-	cookieFilename = "bilibili_cookie.txt"
-)
-
 type Client struct {
-	httpClient *http.Client
-	cookies    []*http.Cookie
-	ua         string
+	httpClient     *http.Client
+	cookies        []*http.Cookie
+	ua             string
+	cookieFilePath string
 }
 
-// TODO Update
-func NewClient() *Client {
-	cookies, _ := utils.LoadCookiesFromFile(cookieFilename)
+func NewClient(opts ...Option) *Client {
+	opt := applyOptions(opts...)
+
+	cookies, _ := utils.LoadCookiesFromFile(opt.CookieFilePath)
 
 	return &Client{
-		httpClient: http.DefaultClient,
-		cookies:    cookies,
-		ua:         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
+		httpClient:     opt.HttpClient,
+		cookies:        cookies,
+		ua:             opt.UserAgent,
+		cookieFilePath: opt.CookieFilePath,
 	}
 }
 
@@ -63,7 +62,7 @@ func (c *Client) LoginWithQrCode() {
 		switch resp.Code {
 		case 0:
 			logrus.Infof("login success!!!")
-			_ = utils.SaveCookiesToFile(cookieFilename, c.cookies) // todo 改为可配置
+			_ = utils.SaveCookiesToFile(c.cookieFilePath, c.cookies) // todo 改为可配置
 			return
 		case 86038:
 			logrus.Errorf("qrcode expired")
