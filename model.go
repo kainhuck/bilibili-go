@@ -44,3 +44,15 @@ type QrcodePollResponse struct {
 	Code         int    `json:"code"`
 	Message      string `json:"message"`
 }
+
+// AccountResponse for account response
+type AccountResponse struct {
+	Mid      int64  `json:"mid"`
+	UName    string `json:"uname"`
+	UserID   string `json:"userid"`
+	Sign     string `json:"sign"`
+	BirthDay string `json:"birthday"`
+	Sex      string `json:"sex"`
+	NickFree bool   `json:"nick_free"`
+	Rank     string `json:"rank"`
+}

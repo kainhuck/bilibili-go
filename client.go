@@ -2,6 +2,7 @@ package bilibili_go
 
 import (
 	"fmt"
+	"github.com/kainhuck/bilibili-go/internal/utils"
 	"github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
 	"io"
@@ -9,6 +10,10 @@ import (
 	"net/url"
 	"os"
 	"time"
+)
+
+const (
+	cookieFilename = "bilibili_cookie.txt"
 )
 
 type Client struct {
@@ -19,8 +24,11 @@ type Client struct {
 
 // TODO Update
 func NewClient() *Client {
+	cookies, _ := utils.LoadCookiesFromFile(cookieFilename)
+
 	return &Client{
 		httpClient: http.DefaultClient,
+		cookies:    cookies,
 		ua:         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
 	}
 }
@@ -55,6 +63,7 @@ func (c *Client) LoginWithQrCode() {
 		switch resp.Code {
 		case 0:
 			logrus.Infof("login success!!!")
+			_ = utils.SaveCookiesToFile(cookieFilename, c.cookies) // todo 改为可配置
 			return
 		case 86038:
 			logrus.Errorf("qrcode expired")

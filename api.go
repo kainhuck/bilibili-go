@@ -6,7 +6,7 @@ import (
 	"net/url"
 )
 
-// https://passport.bilibili.com/x/passport-login/web/qrcode/generate
+// 获取登陆二维码 https://passport.bilibili.com/x/passport-login/web/qrcode/generate
 func (c *Client) qrcodeGenerate() (*QrcodeGenerateResponse, error) {
 	uri := "https://passport.bilibili.com/x/passport-login/web/qrcode/generate"
 
@@ -21,6 +21,7 @@ func (c *Client) qrcodeGenerate() (*QrcodeGenerateResponse, error) {
 	return rsp, err
 }
 
+// 查询二维码扫描状态 https://passport.bilibili.com/x/passport-login/web/qrcode/poll
 func (c *Client) qrcodePoll(qrcodeKey string) (*QrcodePollResponse, error) {
 	uri := "https://passport.bilibili.com/x/passport-login/web/qrcode/poll"
 
@@ -35,6 +36,21 @@ func (c *Client) qrcodePoll(qrcodeKey string) (*QrcodePollResponse, error) {
 	}
 
 	rsp := &QrcodePollResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetAccount 获取个人账号信息 https://api.bilibili.com/x/member/web/account
+func (c *Client) GetAccount() (*AccountResponse, error) {
+	uri := "https://api.bilibili.com/x/member/web/account"
+
+	baseResp, err := c.get(uri, nil, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	rsp := &AccountResponse{}
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
 	return rsp, err
