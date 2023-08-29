@@ -55,3 +55,18 @@ func (c *Client) GetAccount() (*AccountResponse, error) {
 
 	return rsp, err
 }
+
+// GetNavigation 获取导航栏信息 https://api.bilibili.com/x/web-interface/nav
+func (c *Client) GetNavigation() (*NavigationResponse, error) {
+	uri := "https://api.bilibili.com/x/web-interface/nav"
+
+	baseResp, err := c.get(uri, nil, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	rsp := &NavigationResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}

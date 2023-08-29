@@ -16,4 +16,11 @@ func main() {
 		log.Fatal(err)
 	}
 	spew.Dump(account)
+
+	// 获取导航栏信息
+	nav, err := client.GetNavigation()
+	if err != nil {
+		log.Fatal(err)
+	}
+	spew.Dump(nav)
 }
