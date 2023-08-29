@@ -62,7 +62,6 @@ func (c *Client) LoginWithQrCode() {
 		switch resp.Code {
 		case 0:
 			logrus.Infof("login success!!!")
-			_ = utils.SaveCookiesToFile(c.cookieFilePath, c.cookies) // todo 改为可配置
 			return
 		case 86038:
 			logrus.Errorf("qrcode expired")
@@ -70,6 +69,28 @@ func (c *Client) LoginWithQrCode() {
 		}
 		time.Sleep(1 * time.Second)
 	}
+}
+
+// LoginWithQrCodeWithCache 带有缓存的二维码登陆
+func (c *Client) LoginWithQrCodeWithCache() {
+
+	if utils.FileExists(c.cookieFilePath) {
+		cookies, err := utils.LoadCookiesFromFile(c.cookieFilePath)
+		if err != nil {
+			logrus.Errorf("load cookie from file: %v failed: %v", c.cookieFilePath, err)
+			os.Exit(-1)
+		}
+
+		if len(cookies) != 0 {
+			c.cookies = cookies
+			logrus.Infof("load cookie from: %v", c.cookieFilePath)
+			return
+		}
+	}
+
+	c.LoginWithQrCode()
+
+	_ = utils.SaveCookiesToFile(c.cookieFilePath, c.cookies)
 }
 
 /* ===================== helper ===================== */

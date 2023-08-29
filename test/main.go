@@ -8,7 +8,7 @@ import (
 
 func main() {
 	client := bilibili_go.NewClient()
-	//client.LoginWithQrCode()
+	client.LoginWithQrCodeWithCache()
 
 	nav, err := client.GetNavigationStatus()
 	if err != nil {
