@@ -56,7 +56,7 @@ func (c *Client) GetAccount() (*AccountResponse, error) {
 	return rsp, err
 }
 
-// GetNavigation 获取导航栏信息 https://api.bilibili.com/x/web-interface/nav
+// GetNavigation 获取导航栏信息（个人详细信息） https://api.bilibili.com/x/web-interface/nav
 func (c *Client) GetNavigation() (*NavigationResponse, error) {
 	uri := "https://api.bilibili.com/x/web-interface/nav"
 
@@ -66,6 +66,21 @@ func (c *Client) GetNavigation() (*NavigationResponse, error) {
 	}
 
 	rsp := &NavigationResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetNavigationStatus 获取导航栏状态（粉丝数信息）https://api.bilibili.com/x/web-interface/nav/stat
+func (c *Client) GetNavigationStatus() (*NavigationStatusResponse, error) {
+	uri := "https://api.bilibili.com/x/web-interface/nav/stat"
+
+	baseResp, err := c.get(uri, nil, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	rsp := &NavigationStatusResponse{}
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
 	return rsp, err

@@ -10,15 +10,7 @@ func main() {
 	client := bilibili_go.NewClient()
 	//client.LoginWithQrCode()
 
-	// 获取个人信息
-	account, err := client.GetAccount()
-	if err != nil {
-		log.Fatal(err)
-	}
-	spew.Dump(account)
-
-	// 获取导航栏信息
-	nav, err := client.GetNavigation()
+	nav, err := client.GetNavigationStatus()
 	if err != nil {
 		log.Fatal(err)
 	}

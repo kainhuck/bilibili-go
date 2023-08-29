@@ -163,3 +163,10 @@ type WBIImage struct {
 	ImgURL string `json:"img_url"`
 	SubURL string `json:"sub_url"`
 }
+
+// NavigationStatusResponse for navigation status Response
+type NavigationStatusResponse struct {
+	Following    int64 `json:"following"`     // 关注数
+	Follower     int64 `json:"follower"`      // 粉丝数
+	DynamicCount int64 `json:"dynamic_count"` // 动态数
+}
