@@ -95,7 +95,7 @@ func (c *Client) LoginWithQrCodeWithCache() {
 
 /* ===================== helper ===================== */
 
-func (c *Client) do(req *http.Request, beforeDo func(request *http.Request), afterDo func(response *http.Response)) (*BaseResponse, error) {
+func (c *Client) do(req *http.Request, beforeDo func(request *http.Request) error, afterDo func(response *http.Response) error) (*BaseResponse, error) {
 	req.Header.Set("User-Agent", c.ua)
 
 	for _, cookie := range c.cookies {
@@ -103,7 +103,9 @@ func (c *Client) do(req *http.Request, beforeDo func(request *http.Request), aft
 	}
 
 	if beforeDo != nil {
-		beforeDo(req)
+		if err := beforeDo(req); err != nil {
+			return nil, err
+		}
 	}
 
 	resp, err := c.httpClient.Do(req)
@@ -112,13 +114,15 @@ func (c *Client) do(req *http.Request, beforeDo func(request *http.Request), aft
 	}
 	defer resp.Body.Close()
 	if afterDo != nil {
-		afterDo(resp)
+		if err := afterDo(resp); err != nil {
+			return nil, err
+		}
 	}
 
 	return NewBaseResponse(resp.Body)
 }
 
-func (c *Client) get(uri string, param url.Values, beforeDo func(request *http.Request), afterDo func(response *http.Response)) (*BaseResponse, error) {
+func (c *Client) get(uri string, param url.Values, beforeDo func(request *http.Request) error, afterDo func(response *http.Response) error) (*BaseResponse, error) {
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
 		return nil, err
@@ -131,7 +135,7 @@ func (c *Client) get(uri string, param url.Values, beforeDo func(request *http.R
 	return c.do(req, beforeDo, afterDo)
 }
 
-func (c *Client) post(uri string, body io.Reader, beforeDo func(request *http.Request), afterDo func(response *http.Response)) (*BaseResponse, error) {
+func (c *Client) post(uri string, body io.Reader, beforeDo func(request *http.Request) error, afterDo func(response *http.Response) error) (*BaseResponse, error) {
 	req, err := http.NewRequest(http.MethodPost, uri, body)
 	if err != nil {
 		return nil, err

@@ -170,3 +170,21 @@ type NavigationStatusResponse struct {
 	Follower     int64 `json:"follower"`      // 粉丝数
 	DynamicCount int64 `json:"dynamic_count"` // 动态数
 }
+
+// PreUploadResponse ...
+type PreUploadResponse struct {
+	OK              int         `json:"OK"`
+	Auth            string      `json:"auth"`
+	BizID           int         `json:"biz_id"`
+	ChunkRetry      int         `json:"chunk_retry"`
+	ChunkRetryDelay int         `json:"chunk_retry_delay"`
+	ChunkSize       int         `json:"chunk_size"`
+	Endpoint        string      `json:"endpoint"`
+	Endpoints       []string    `json:"endpoints"`
+	ExposeParams    interface{} `json:"expose_params"`
+	PutQuery        string      `json:"put_query"`
+	Threads         int         `json:"threads"`
+	Timeout         int         `json:"timeout"`
+	UIP             string      `json:"uip"`
+	UposURI         string      `json:"upos_uri"`
+}
