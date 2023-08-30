@@ -131,7 +131,7 @@ func (c *Client) Upload(filepath string) error {
 		close(errChan)
 	}()
 	for i, part := range parts {
-		func(part []byte, number int) {
+		go func(part []byte, number int) {
 			defer wg.Done()
 			errChan <- c.uploadFileClip(preResp.Uri(), preResp.Auth, uploadIDResp.UploadID, number, len(parts), len(part), (number-1)*10*utils.MB, (number-1)*10*utils.MB+len(part), fileInfo.Size(), part)
 		}(part, i+1)
