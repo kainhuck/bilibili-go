@@ -3,6 +3,7 @@ package bilibili_go
 import (
 	"encoding/json"
 	"io"
+	"strings"
 )
 
 // BaseResponse dor base response
@@ -187,6 +188,10 @@ type PreUploadResponse struct {
 	Timeout         int         `json:"timeout"`
 	UIP             string      `json:"uip"`
 	UposURI         string      `json:"upos_uri"`
+}
+
+func (r *PreUploadResponse) Uri() string {
+	return "https:" + r.Endpoint + "/" + strings.TrimPrefix(r.UposURI, "upos://")
 }
 
 // GetUploadIDResponse ...

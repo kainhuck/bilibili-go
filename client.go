@@ -8,6 +8,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -90,6 +91,59 @@ func (c *Client) LoginWithQrCodeWithCache() {
 	c.LoginWithQrCode()
 
 	_ = utils.SaveCookiesToFile(c.cookieFilePath, c.cookies)
+}
+
+// Upload 上传视频
+func (c *Client) Upload(filepath string) error {
+	fileInfo, err := os.Stat(filepath)
+	if err != nil {
+		return err
+	}
+
+	// 调接口上传
+	// 1. 预上传
+	preResp, err := c.preUpload(fileInfo.Name(), fileInfo.Size())
+	if err != nil {
+		return err
+	}
+
+	// 2. 获取 upload_id
+	uploadIDResp, err := c.getUploadID(preResp.Uri(), preResp.Auth, preResp.BizID, fileInfo.Size())
+	if err != nil {
+		return err
+	}
+
+	// 3. 分片上传
+	total, err := os.ReadFile(filepath)
+	if err != nil {
+		return err
+	}
+
+	// 分区
+	parts := utils.SplitBytes(total, 10*utils.MB)
+
+	errChan := make(chan error, len(parts))
+	wg := sync.WaitGroup{}
+
+	wg.Add(len(parts))
+	go func() {
+		wg.Wait()
+		close(errChan)
+	}()
+	for i, part := range parts {
+		func(part []byte, number int) {
+			defer wg.Done()
+			errChan <- c.uploadFileClip(preResp.Uri(), preResp.Auth, uploadIDResp.UploadID, number, len(parts), len(part), (number-1)*10*utils.MB, (number-1)*10*utils.MB+len(part), fileInfo.Size(), part)
+		}(part, i+1)
+	}
+
+	for err := range errChan {
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 /* ===================== helper ===================== */

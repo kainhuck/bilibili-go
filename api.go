@@ -1,11 +1,11 @@
 package bilibili_go
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 // 获取登陆二维码 https://passport.bilibili.com/x/passport-login/web/qrcode/generate
@@ -102,7 +102,7 @@ func (c *Client) GetNavigationStatus() (*NavigationStatusResponse, error) {
 }
 
 // 视频预上传 https://member.bilibili.com/preupload
-func (c *Client) PreUpload(filename string, size int64) (*PreUploadResponse, error) {
+func (c *Client) preUpload(filename string, size int64) (*PreUploadResponse, error) {
 	uri := "https://member.bilibili.com/preupload"
 
 	var resp PreUploadResponse
@@ -127,20 +127,18 @@ func (c *Client) PreUpload(filename string, size int64) (*PreUploadResponse, err
 }
 
 // 获取上传id https://upos-cs-upcdnbldsa.bilivideo.com
-func (c *Client) GetUploadID(preResp *PreUploadResponse, size int64) (*GetUploadIDResponse, error) {
-	uri := "https:" + preResp.Endpoint + "/" + strings.TrimPrefix(preResp.UposURI, "upos://")
-
+func (c *Client) getUploadID(uri string, auth string, bizID int, size int64) (*GetUploadIDResponse, error) {
 	var resp GetUploadIDResponse
 
 	err := c.getHttpClient(true).Post(uri).
-		SetHeader("X-Upos-Auth", preResp.Auth).
+		SetHeader("X-Upos-Auth", auth).
 		AddParams("uploads", "").
 		AddParams("output", "json").
 		AddParams("profile", "ugcfx/bup").
 		AddParams("filesize", strconv.FormatInt(size, 10)).
 		AddParams("partsize", "10485760"). // 块大小：10mb
 		AddParams("meta_upos_uri", "upos://fxmetalf/n230829qn283p9ffyholy2gigl5advkd.txt").
-		AddParams("biz_id", strconv.Itoa(preResp.BizID)).
+		AddParams("biz_id", strconv.Itoa(bizID)).
 		EndStruct(&resp)
 
 	if err != nil {
@@ -151,18 +149,18 @@ func (c *Client) GetUploadID(preResp *PreUploadResponse, size int64) (*GetUpload
 }
 
 // 分片上传文件
-func (c *Client) UploadFileClip(preResp *PreUploadResponse, uploadId string, partNumber int) error {
-	uri := "https:" + preResp.Endpoint + "/" + strings.TrimPrefix(preResp.UposURI, "upos://")
-
+func (c *Client) uploadFileClip(uri string, auth string, uploadId string, partNumber int, chunks int, size int, start int, end int, total int64, file []byte) error {
 	_, _, err := c.getHttpClient(true).Put(uri).
+		SetHeader("X-Upos-Auth", auth).
 		AddParams("partNumber", strconv.Itoa(partNumber)).
 		AddParams("uploadId", uploadId).
-		AddParams("chunk", "").
-		AddParams("chunks", "").
-		AddParams("size", "").
-		AddParams("start", "").
-		AddParams("end", "").
-		AddParams("total", "").
+		AddParams("chunk", strconv.Itoa(partNumber-1)).
+		AddParams("chunks", strconv.Itoa(chunks)).
+		AddParams("size", strconv.Itoa(size)).
+		AddParams("start", strconv.Itoa(start)).
+		AddParams("end", strconv.Itoa(end)).
+		AddParams("total", strconv.FormatInt(total, 10)).
+		SendBody(bytes.NewReader(file)).
 		End()
 
 	return err
