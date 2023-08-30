@@ -13,7 +13,7 @@ func (c *Client) qrcodeGenerate() (*QrcodeGenerateResponse, error) {
 	uri := "https://passport.bilibili.com/x/passport-login/web/qrcode/generate"
 
 	var baseResp BaseResponse
-	err := c.httpClient.Clone().Get(uri).EndStruct(&baseResp)
+	err := c.getHttpClient(false).Get(uri).EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
 	}
@@ -28,11 +28,8 @@ func (c *Client) qrcodeGenerate() (*QrcodeGenerateResponse, error) {
 func (c *Client) qrcodePoll(qrcodeKey string) (*QrcodePollResponse, error) {
 	uri := "https://passport.bilibili.com/x/passport-login/web/qrcode/poll"
 
-	param := make(url.Values)
-	param.Add("qrcode_key", qrcodeKey)
-
 	var baseResp BaseResponse
-	err := c.httpClient.Clone().Get(uri).EndStruct(&baseResp, func(response *http.Response) error {
+	err := c.getHttpClient(false).Get(uri).AddParams("qrcode_key", qrcodeKey).EndStruct(&baseResp, func(response *http.Response) error {
 		c.cookies = response.Cookies()
 
 		return nil
@@ -52,7 +49,7 @@ func (c *Client) GetAccount() (*AccountResponse, error) {
 	uri := "https://api.bilibili.com/x/member/web/account"
 
 	var baseResp BaseResponse
-	err := c.httpClient.Clone().Get(uri).SetCookies(c.cookies).EndStruct(&baseResp)
+	err := c.getHttpClient(true).Get(uri).EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +68,7 @@ func (c *Client) GetNavigation() (*NavigationResponse, error) {
 	uri := "https://api.bilibili.com/x/web-interface/nav"
 
 	var baseResp BaseResponse
-	err := c.httpClient.Clone().Get(uri).SetCookies(c.cookies).EndStruct(&baseResp)
+	err := c.getHttpClient(true).Get(uri).EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +87,7 @@ func (c *Client) GetNavigationStatus() (*NavigationStatusResponse, error) {
 	uri := "https://api.bilibili.com/x/web-interface/nav/stat"
 
 	var baseResp BaseResponse
-	err := c.httpClient.Clone().Get(uri).SetCookies(c.cookies).EndStruct(&baseResp)
+	err := c.getHttpClient(true).Get(uri).EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
 	}

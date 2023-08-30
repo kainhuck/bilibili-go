@@ -10,7 +10,7 @@ func main() {
 	client := bilibili_go.NewClient()
 	client.LoginWithQrCodeWithCache()
 
-	resp, err := client.GetNavigation()
+	resp, err := client.GetNavigationStatus()
 	if err != nil {
 		log.Fatal(err)
 	}

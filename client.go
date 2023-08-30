@@ -91,3 +91,15 @@ func (c *Client) LoginWithQrCodeWithCache() {
 
 	_ = utils.SaveCookiesToFile(c.cookieFilePath, c.cookies)
 }
+
+/* ===================== helper ===================== */
+
+func (c *Client) getHttpClient(auth bool) *net.HttpClient {
+	client := c.httpClient.Clone()
+
+	if auth {
+		client.SetCookies(c.cookies)
+	}
+
+	return client
+}
