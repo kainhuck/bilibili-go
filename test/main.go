@@ -10,14 +10,15 @@ func main() {
 	client := bilibili_go.NewClient()
 	client.LoginWithQrCodeWithCache()
 
-	resp, err := client.GetNavigationStatus()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//nav, err := client.PreUpload("asdsad.txt", 100000)
+	//resp, err := client.GetNavigationStatus()
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
+	//spew.Dump(resp)
+
+	resp, err := client.PreUpload("asdsad.txt", 100000)
+	if err != nil {
+		log.Fatal(err)
+	}
 	spew.Dump(resp)
 }

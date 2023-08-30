@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strconv"
 )
 
@@ -105,20 +104,20 @@ func (c *Client) GetNavigationStatus() (*NavigationStatusResponse, error) {
 func (c *Client) PreUpload(filename string, size int64) (*PreUploadResponse, error) {
 	uri := "https://member.bilibili.com/preupload"
 
-	values := url.Values{}
-	values.Add("zone", "cs")
-	values.Add("upcdn", "bldsa")
-	values.Add("probe_version", "20221109")
-	values.Add("name", filename)
-	values.Add("r", "upos")
-	values.Add("profile", "ugcfx/bup")
-	values.Add("ssl", "0")
-	values.Add("version", "2.14.0.0")
-	values.Add("size", strconv.FormatInt(size, 10))
-	values.Add("webVersion", "2.14.0")
-
 	var resp PreUploadResponse
-	err := c.httpClient.Clone().Get(uri).SetCookies(c.cookies).EndStruct(&resp)
+
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("zone", "cs").
+		AddParams("upcdn", "bldsa").
+		AddParams("probe_version", "20221109").
+		AddParams("name", filename).
+		AddParams("r", "upos").
+		AddParams("profile", "ugcfx/bup").
+		AddParams("ssl", "0").
+		AddParams("version", "2.14.0.0").
+		AddParams("size", strconv.FormatInt(size, 10)).
+		AddParams("webVersion", "2.14.0").
+		EndStruct(&resp)
 	if err != nil {
 		return nil, err
 	}
