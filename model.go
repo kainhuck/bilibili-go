@@ -188,3 +188,11 @@ type PreUploadResponse struct {
 	UIP             string      `json:"uip"`
 	UposURI         string      `json:"upos_uri"`
 }
+
+// GetUploadIDResponse ...
+type GetUploadIDResponse struct {
+	OK       int    `json:"OK"`
+	Bucket   string `json:"bucket"`
+	Key      string `json:"key"`
+	UploadID string `json:"upload_id"`
+}

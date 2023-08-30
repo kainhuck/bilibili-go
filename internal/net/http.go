@@ -66,6 +66,13 @@ func (c *HttpClient) Post(uri string) *HttpClient {
 	return c
 }
 
+func (c *HttpClient) Put(uri string) *HttpClient {
+	c.method = http.MethodPut
+	c.uri = uri
+
+	return c
+}
+
 func (c *HttpClient) AddParams(key string, value string) *HttpClient {
 	c.params.Add(key, value)
 
@@ -92,7 +99,7 @@ func (c *HttpClient) SendBody(body io.Reader) *HttpClient {
 
 func (c *HttpClient) SetCookies(cookies []*http.Cookie) *HttpClient {
 	c.cookies = cookies
-	
+
 	return c
 }
 

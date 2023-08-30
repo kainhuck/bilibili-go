@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // 获取登陆二维码 https://passport.bilibili.com/x/passport-login/web/qrcode/generate
@@ -123,4 +124,46 @@ func (c *Client) PreUpload(filename string, size int64) (*PreUploadResponse, err
 	}
 
 	return &resp, err
+}
+
+// 获取上传id https://upos-cs-upcdnbldsa.bilivideo.com
+func (c *Client) GetUploadID(preResp *PreUploadResponse, size int64) (*GetUploadIDResponse, error) {
+	uri := "https:" + preResp.Endpoint + "/" + strings.TrimPrefix(preResp.UposURI, "upos://")
+
+	var resp GetUploadIDResponse
+
+	err := c.getHttpClient(true).Post(uri).
+		SetHeader("X-Upos-Auth", preResp.Auth).
+		AddParams("uploads", "").
+		AddParams("output", "json").
+		AddParams("profile", "ugcfx/bup").
+		AddParams("filesize", strconv.FormatInt(size, 10)).
+		AddParams("partsize", "10485760"). // 块大小：10mb
+		AddParams("meta_upos_uri", "upos://fxmetalf/n230829qn283p9ffyholy2gigl5advkd.txt").
+		AddParams("biz_id", strconv.Itoa(preResp.BizID)).
+		EndStruct(&resp)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp, err
+}
+
+// 分片上传文件
+func (c *Client) UploadFileClip(preResp *PreUploadResponse, uploadId string, partNumber int) error {
+	uri := "https:" + preResp.Endpoint + "/" + strings.TrimPrefix(preResp.UposURI, "upos://")
+
+	_, _, err := c.getHttpClient(true).Put(uri).
+		AddParams("partNumber", strconv.Itoa(partNumber)).
+		AddParams("uploadId", uploadId).
+		AddParams("chunk", "").
+		AddParams("chunks", "").
+		AddParams("size", "").
+		AddParams("start", "").
+		AddParams("end", "").
+		AddParams("total", "").
+		End()
+
+	return err
 }
