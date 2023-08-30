@@ -2,6 +2,7 @@ package bilibili_go
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -11,7 +12,8 @@ import (
 func (c *Client) qrcodeGenerate() (*QrcodeGenerateResponse, error) {
 	uri := "https://passport.bilibili.com/x/passport-login/web/qrcode/generate"
 
-	baseResp, err := c.get(uri, nil, nil, nil)
+	var baseResp BaseResponse
+	err := c.httpClient.Clone().Get(uri).EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +31,8 @@ func (c *Client) qrcodePoll(qrcodeKey string) (*QrcodePollResponse, error) {
 	param := make(url.Values)
 	param.Add("qrcode_key", qrcodeKey)
 
-	baseResp, err := c.get(uri, param, nil, func(response *http.Response) error {
+	var baseResp BaseResponse
+	err := c.httpClient.Clone().Get(uri).EndStruct(&baseResp, func(response *http.Response) error {
 		c.cookies = response.Cookies()
 
 		return nil
@@ -48,9 +51,13 @@ func (c *Client) qrcodePoll(qrcodeKey string) (*QrcodePollResponse, error) {
 func (c *Client) GetAccount() (*AccountResponse, error) {
 	uri := "https://api.bilibili.com/x/member/web/account"
 
-	baseResp, err := c.get(uri, nil, nil, nil)
+	var baseResp BaseResponse
+	err := c.httpClient.Clone().Get(uri).SetCookies(c.cookies).EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
 	}
 
 	rsp := &AccountResponse{}
@@ -63,9 +70,13 @@ func (c *Client) GetAccount() (*AccountResponse, error) {
 func (c *Client) GetNavigation() (*NavigationResponse, error) {
 	uri := "https://api.bilibili.com/x/web-interface/nav"
 
-	baseResp, err := c.get(uri, nil, nil, nil)
+	var baseResp BaseResponse
+	err := c.httpClient.Clone().Get(uri).SetCookies(c.cookies).EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
 	}
 
 	rsp := &NavigationResponse{}
@@ -78,9 +89,13 @@ func (c *Client) GetNavigation() (*NavigationResponse, error) {
 func (c *Client) GetNavigationStatus() (*NavigationStatusResponse, error) {
 	uri := "https://api.bilibili.com/x/web-interface/nav/stat"
 
-	baseResp, err := c.get(uri, nil, nil, nil)
+	var baseResp BaseResponse
+	err := c.httpClient.Clone().Get(uri).SetCookies(c.cookies).EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
 	}
 
 	rsp := &NavigationStatusResponse{}
@@ -90,7 +105,7 @@ func (c *Client) GetNavigationStatus() (*NavigationStatusResponse, error) {
 }
 
 // 视频预上传 https://member.bilibili.com/preupload
-func (c *Client) PreUpload(filename string, size int64) (*NavigationStatusResponse, error) {
+func (c *Client) PreUpload(filename string, size int64) (*PreUploadResponse, error) {
 	uri := "https://member.bilibili.com/preupload"
 
 	values := url.Values{}
@@ -106,17 +121,10 @@ func (c *Client) PreUpload(filename string, size int64) (*NavigationStatusRespon
 	values.Add("webVersion", "2.14.0")
 
 	var resp PreUploadResponse
-
-	// todo
-	baseResp, err := c.get(uri, values, nil, func(response *http.Response) error {
-		return json.NewDecoder(response.Body).Decode(&resp)
-	})
+	err := c.httpClient.Clone().Get(uri).SetCookies(c.cookies).EndStruct(&resp)
 	if err != nil {
 		return nil, err
 	}
 
-	rsp := &NavigationStatusResponse{}
-	err = json.Unmarshal(baseResp.RawData(), &rsp)
-
-	return rsp, err
+	return &resp, err
 }

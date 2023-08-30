@@ -2,18 +2,17 @@ package bilibili_go
 
 import (
 	"fmt"
+	"github.com/kainhuck/bilibili-go/internal/net"
 	"github.com/kainhuck/bilibili-go/internal/utils"
 	"github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
-	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"time"
 )
 
 type Client struct {
-	httpClient     *http.Client
+	httpClient     *net.HttpClient
 	cookies        []*http.Cookie
 	ua             string
 	cookieFilePath string
@@ -25,7 +24,7 @@ func NewClient(opts ...Option) *Client {
 	cookies, _ := utils.LoadCookiesFromFile(opt.CookieFilePath)
 
 	return &Client{
-		httpClient:     opt.HttpClient,
+		httpClient:     net.NewHttpClient(opt.HttpClient),
 		cookies:        cookies,
 		ua:             opt.UserAgent,
 		cookieFilePath: opt.CookieFilePath,
@@ -91,55 +90,4 @@ func (c *Client) LoginWithQrCodeWithCache() {
 	c.LoginWithQrCode()
 
 	_ = utils.SaveCookiesToFile(c.cookieFilePath, c.cookies)
-}
-
-/* ===================== helper ===================== */
-
-func (c *Client) do(req *http.Request, beforeDo func(request *http.Request) error, afterDo func(response *http.Response) error) (*BaseResponse, error) {
-	req.Header.Set("User-Agent", c.ua)
-
-	for _, cookie := range c.cookies {
-		req.AddCookie(cookie)
-	}
-
-	if beforeDo != nil {
-		if err := beforeDo(req); err != nil {
-			return nil, err
-		}
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	if afterDo != nil {
-		if err := afterDo(resp); err != nil {
-			return nil, err
-		}
-	}
-
-	return NewBaseResponse(resp.Body)
-}
-
-func (c *Client) get(uri string, param url.Values, beforeDo func(request *http.Request) error, afterDo func(response *http.Response) error) (*BaseResponse, error) {
-	req, err := http.NewRequest(http.MethodGet, uri, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if param != nil {
-		req.URL.RawQuery = param.Encode()
-	}
-
-	return c.do(req, beforeDo, afterDo)
-}
-
-func (c *Client) post(uri string, body io.Reader, beforeDo func(request *http.Request) error, afterDo func(response *http.Response) error) (*BaseResponse, error) {
-	req, err := http.NewRequest(http.MethodPost, uri, body)
-	if err != nil {
-		return nil, err
-	}
-
-	return c.do(req, beforeDo, afterDo)
 }
