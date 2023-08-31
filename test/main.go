@@ -10,9 +10,9 @@ func main() {
 	client := bilibili_go.NewClient()
 	client.LoginWithQrCodeWithCache()
 
-	err := client.Upload("/Users/edy/Downloads/whale-宣传视频.mp4")
+	resp, err := client.Upload("/Users/edy/Downloads/一起去郊游吧.mp4", "/Users/edy/Downloads/111.jpeg")
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("success")
+	fmt.Println("success", resp.Aid, resp.Bvid)
 }

@@ -2,10 +2,13 @@ package bilibili_go
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
+	"time"
 )
 
 // 获取登陆二维码 https://passport.bilibili.com/x/passport-login/web/qrcode/generate
@@ -187,5 +190,63 @@ func (c *Client) uploadCheck(uri string, auth string, filename string, uploadID 
 }
 
 // 上传封面 https://member.bilibili.com/x/vu/web/cover/up
+func (c *Client) uploadCover(image string) (*UploadCoverResponse, error) {
+	uri := "https://member.bilibili.com/x/vu/web/cover/up"
+
+	imageData, err := os.ReadFile(image)
+	if err != nil {
+		return nil, err
+	}
+	base64Str := base64.StdEncoding.EncodeToString(imageData)
+
+	var baseResp BaseResponse
+
+	err = c.getHttpClient(true).Post(uri).
+		AddParams("t", strconv.FormatInt(time.Now().UnixMilli(), 10)).
+		AddFormData("cover", "data:image/jpeg;base64,"+base64Str).
+		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &UploadCoverResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
 
 // 投稿 https://member.bilibili.com/x/vu/web/add/v3
+func (c *Client) submit(req *SubmitRequest) (*SubmitResponse, error) {
+	uri := "https://member.bilibili.com/x/vu/web/add/v3"
+
+	req.CSRF = c.cookieCache["bili_jct"]
+
+	reqData, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var baseResp BaseResponse
+
+	err = c.getHttpClient(true).
+		SetContentType("application/json;charset=UTF-8").
+		Post(uri).
+		SendBody(bytes.NewReader(reqData)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &SubmitResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}

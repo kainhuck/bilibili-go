@@ -8,6 +8,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -15,6 +16,7 @@ import (
 type Client struct {
 	httpClient     *net.HttpClient
 	cookies        []*http.Cookie
+	cookieCache    map[string]string
 	ua             string
 	cookieFilePath string
 }
@@ -27,6 +29,7 @@ func NewClient(opts ...Option) *Client {
 	return &Client{
 		httpClient:     net.NewHttpClient(opt.HttpClient),
 		cookies:        cookies,
+		cookieCache:    make(map[string]string),
 		ua:             opt.UserAgent,
 		cookieFilePath: opt.CookieFilePath,
 	}
@@ -83,6 +86,9 @@ func (c *Client) LoginWithQrCodeWithCache() {
 
 		if len(cookies) != 0 {
 			c.cookies = cookies
+			for _, cookie := range cookies {
+				c.cookieCache[cookie.Name] = cookie.Value
+			}
 			logrus.Infof("load cookie from: %v", c.cookieFilePath)
 			return
 		}
@@ -94,35 +100,35 @@ func (c *Client) LoginWithQrCodeWithCache() {
 }
 
 // Upload 上传视频
-func (c *Client) Upload(filepath string) error {
+func (c *Client) Upload(filepath string, cover string) (*SubmitResponse, error) {
 	fileInfo, err := os.Stat(filepath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// 调接口上传
 	// 1. 预上传
 	preResp, err := c.preUpload(fileInfo.Name(), fileInfo.Size())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if preResp.OK != 1 {
-		return fmt.Errorf("[preUpload] upload failed code: %v", preResp.OK)
+		return nil, fmt.Errorf("[preUpload] upload failed code: %v", preResp.OK)
 	}
 
 	// 2. 获取 upload_id
 	uploadIDResp, err := c.getUploadID(preResp.Uri(), preResp.Auth, preResp.BizID, fileInfo.Size())
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if uploadIDResp.OK != 1 {
-		return fmt.Errorf("[getUploadID] upload failed code: %v", uploadIDResp.OK)
+		return nil, fmt.Errorf("[getUploadID] upload failed code: %v", uploadIDResp.OK)
 	}
 
 	// 3. 分片上传
 	total, err := os.ReadFile(filepath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// 分区
@@ -145,21 +151,54 @@ func (c *Client) Upload(filepath string) error {
 
 	for err := range errChan {
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	// 上传完成
+	// 视频上传完成
 	checkResp, err := c.uploadCheck(preResp.Uri(), preResp.Auth, fileInfo.Name(), uploadIDResp.UploadID, preResp.BizID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if checkResp.OK != 1 {
-		return fmt.Errorf("[uploadCheck] upload failed code: %v", checkResp.OK)
+		return nil, fmt.Errorf("[uploadCheck] upload failed code: %v", checkResp.OK)
 	}
 
-	return nil
+	// 上传封面
+	coverResp, err := c.uploadCover(cover)
+	if err != nil {
+		return nil, err
+	}
+
+	// 调用接口发布
+	return c.submit(&SubmitRequest{
+		Cover:        coverResp.Url,
+		Title:        strings.Split(fileInfo.Name(), ".")[0],
+		Copyright:    1,
+		TID:          229,
+		Tag:          "视频",
+		DescFormatID: 9999,
+		Desc:         "hello bilibili",
+		Recreate:     -1,
+		Dynamic:      "",
+		Interactive:  0,
+		Videos: []Video{
+			{
+				Filename: preResp.Filename(),
+				Title:    strings.Split(fileInfo.Name(), ".")[0],
+				Desc:     "",
+				CID:      preResp.BizID,
+			},
+		},
+		ActReserveCreate: 0,
+		NoDisturbance:    0,
+		NoReprint:        1,
+		Subtitle:         Subtitle{},
+		Dolby:            0,
+		LosslessMusic:    0,
+		WebOS:            2,
+	})
 }
 
 /* ===================== helper ===================== */

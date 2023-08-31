@@ -3,6 +3,7 @@ package bilibili_go
 import (
 	"encoding/json"
 	"io"
+	"path/filepath"
 	"strings"
 )
 
@@ -194,6 +195,10 @@ func (r *PreUploadResponse) Uri() string {
 	return "https:" + r.Endpoint + "/" + strings.TrimPrefix(r.UposURI, "upos://")
 }
 
+func (r *PreUploadResponse) Filename() string {
+	return strings.Split(filepath.Base(r.UposURI), ".")[0]
+}
+
 // GetUploadIDResponse ...
 type GetUploadIDResponse struct {
 	OK       int    `json:"OK"`
@@ -209,4 +214,50 @@ type UploadCheckResponse struct {
 	Etag     string `json:"etag"`
 	Key      string `json:"key"`
 	Location string `json:"location"`
+}
+
+// UploadCoverResponse ...
+type UploadCoverResponse struct {
+	Url string `json:"url"`
+}
+
+type Video struct {
+	Filename string `json:"filename"`
+	Title    string `json:"title"`
+	Desc     string `json:"desc"`
+	CID      int    `json:"cid"`
+}
+
+type Subtitle struct {
+	Open bool   `json:"open"`
+	Lan  string `json:"lan"`
+}
+
+// SubmitRequest ...
+type SubmitRequest struct {
+	Cover            string   `json:"cover"`              // 封面 必须
+	Title            string   `json:"title"`              // 标题 必须
+	Copyright        int      `json:"copyright"`          // 是否原创 必须
+	TID              int      `json:"tid"`                // 分类ID 必须
+	Tag              string   `json:"tag"`                // 标签 用逗号分隔 必须
+	DescFormatID     int      `json:"desc_format_id"`     // ？
+	Desc             string   `json:"desc"`               // 简介 必须
+	Recreate         int      `json:"recreate"`           // 二创视频 ？
+	Dynamic          string   `json:"dynamic"`            // 粉丝动态 ？
+	Interactive      int      `json:"interactive"`        // 是否是合作视频 ？
+	Videos           []Video  `json:"videos"`             // 视频 必须
+	ActReserveCreate int      `json:"act_reserve_create"` // 允许二创 ？
+	NoDisturbance    int      `json:"no_disturbance"`     // ？
+	NoReprint        int      `json:"no_reprint"`         // ？
+	Subtitle         Subtitle `json:"subtitle"`           // ？
+	Dolby            int      `json:"dolby"`              // 杜比音效
+	LosslessMusic    int      `json:"lossless_music"`     // 无损音质 ？
+	WebOS            int      `json:"web_os"`             // ？2
+	CSRF             string   `json:"csrf"`               // bili_jct
+}
+
+// SubmitResponse ...
+type SubmitResponse struct {
+	Aid  int64  `json:"aid"`
+	Bvid string `json:"bvid"`
 }
