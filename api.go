@@ -165,3 +165,27 @@ func (c *Client) uploadFileClip(uri string, auth string, uploadId string, partNu
 
 	return err
 }
+
+// 上传完文件后调用该接口
+func (c *Client) uploadCheck(uri string, auth string, filename string, uploadID string, bizID int) (*UploadCheckResponse, error) {
+	var resp UploadCheckResponse
+
+	err := c.getHttpClient(true).Post(uri).
+		SetHeader("X-Upos-Auth", auth).
+		AddParams("output", "json").
+		AddParams("name", filename).
+		AddParams("profile", "ugcfx/bup").
+		AddParams("uploadId", uploadID).
+		AddParams("biz_id", strconv.Itoa(bizID)).
+		EndStruct(&resp)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp, err
+}
+
+// 上传封面 https://member.bilibili.com/x/vu/web/cover/up
+
+// 投稿 https://member.bilibili.com/x/vu/web/add/v3

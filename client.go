@@ -106,11 +106,17 @@ func (c *Client) Upload(filepath string) error {
 	if err != nil {
 		return err
 	}
+	if preResp.OK != 1 {
+		return fmt.Errorf("[preUpload] upload failed code: %v", preResp.OK)
+	}
 
 	// 2. 获取 upload_id
 	uploadIDResp, err := c.getUploadID(preResp.Uri(), preResp.Auth, preResp.BizID, fileInfo.Size())
 	if err != nil {
 		return err
+	}
+	if uploadIDResp.OK != 1 {
+		return fmt.Errorf("[getUploadID] upload failed code: %v", uploadIDResp.OK)
 	}
 
 	// 3. 分片上传
@@ -141,6 +147,16 @@ func (c *Client) Upload(filepath string) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	// 上传完成
+	checkResp, err := c.uploadCheck(preResp.Uri(), preResp.Auth, fileInfo.Name(), uploadIDResp.UploadID, preResp.BizID)
+	if err != nil {
+		return err
+	}
+
+	if checkResp.OK != 1 {
+		return fmt.Errorf("[uploadCheck] upload failed code: %v", checkResp.OK)
 	}
 
 	return nil

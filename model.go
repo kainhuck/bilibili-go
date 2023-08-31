@@ -201,3 +201,12 @@ type GetUploadIDResponse struct {
 	Key      string `json:"key"`
 	UploadID string `json:"upload_id"`
 }
+
+// UploadCheckResponse ...
+type UploadCheckResponse struct {
+	OK       int    `json:"OK"`
+	Bucket   string `json:"bucket"`
+	Etag     string `json:"etag"`
+	Key      string `json:"key"`
+	Location string `json:"location"`
+}
