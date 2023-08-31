@@ -2,8 +2,10 @@ package net
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"strings"
 )
@@ -19,6 +21,7 @@ type HttpClient struct {
 	cookies     []*http.Cookie
 	contentType string // 指定Content-Type
 	userAgent   string // 指定User-Agent
+	debug       bool
 }
 
 func NewHttpClient(client *http.Client) *HttpClient {
@@ -62,6 +65,7 @@ func (c *HttpClient) Clone() *HttpClient {
 		cookies:     clonedCookies,
 		contentType: c.contentType,
 		userAgent:   c.userAgent,
+		debug:       c.debug,
 	}
 }
 
@@ -134,6 +138,12 @@ func (c *HttpClient) SetCookies(cookies []*http.Cookie) *HttpClient {
 	return c
 }
 
+func (c *HttpClient) Debug() *HttpClient {
+	c.debug = true
+
+	return c
+}
+
 func (c *HttpClient) End() (resp *http.Response, body []byte, err error) {
 	if len(c.formData) > 0 {
 		c.body = strings.NewReader(c.formData.Encode())
@@ -165,11 +175,21 @@ func (c *HttpClient) End() (resp *http.Response, body []byte, err error) {
 		request.Header.Add("User-Agent", c.userAgent)
 	}
 
+	if c.debug {
+		bts, _ := httputil.DumpRequest(request, true)
+		fmt.Printf("\n[REQUEST]\n%s\n", string(bts))
+	}
+
 	resp, err = c.httpClient.Do(request)
 	if err != nil {
 		return
 	}
 	defer func() { _ = resp.Body.Close() }()
+
+	if c.debug {
+		bts, _ := httputil.DumpResponse(resp, true)
+		fmt.Printf("\n[RESPONSE]\n%s\n", string(bts))
+	}
 
 	body, err = io.ReadAll(resp.Body)
 
