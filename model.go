@@ -229,7 +229,7 @@ type Video struct {
 }
 
 type Subtitle struct {
-	Open bool   `json:"open"`
+	Open int    `json:"open"`
 	Lan  string `json:"lan"`
 }
 

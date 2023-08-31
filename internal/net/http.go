@@ -155,7 +155,7 @@ func (c *HttpClient) End() (resp *http.Response, body []byte, err error) {
 		return nil, nil, err
 	}
 
-	if c.params != nil {
+	if len(c.params) > 0 {
 		request.URL.RawQuery = c.params.Encode()
 	}
 

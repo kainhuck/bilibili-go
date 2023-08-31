@@ -17,7 +17,6 @@ type Client struct {
 	httpClient     *net.HttpClient
 	cookies        []*http.Cookie
 	cookieCache    map[string]string
-	ua             string
 	cookieFilePath string
 }
 
@@ -26,11 +25,12 @@ func NewClient(opts ...Option) *Client {
 
 	cookies, _ := utils.LoadCookiesFromFile(opt.CookieFilePath)
 
+	client := net.NewHttpClient(opt.HttpClient).SetUserAgent(opt.UserAgent)
+
 	return &Client{
-		httpClient:     net.NewHttpClient(opt.HttpClient),
+		httpClient:     client,
 		cookies:        cookies,
 		cookieCache:    make(map[string]string),
-		ua:             opt.UserAgent,
 		cookieFilePath: opt.CookieFilePath,
 	}
 }
@@ -99,9 +99,9 @@ func (c *Client) LoginWithQrCodeWithCache() {
 	_ = utils.SaveCookiesToFile(c.cookieFilePath, c.cookies)
 }
 
-// Upload 上传视频
-func (c *Client) Upload(filepath string, cover string) (*SubmitResponse, error) {
-	fileInfo, err := os.Stat(filepath)
+// SubmitVideo 视频投稿 video 视频路径 cover 封面路径
+func (c *Client) SubmitVideo(video string, cover string) (*SubmitResponse, error) {
+	fileInfo, err := os.Stat(video)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (c *Client) Upload(filepath string, cover string) (*SubmitResponse, error) 
 	}
 
 	// 3. 分片上传
-	total, err := os.ReadFile(filepath)
+	total, err := os.ReadFile(video)
 	if err != nil {
 		return nil, err
 	}

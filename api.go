@@ -233,7 +233,6 @@ func (c *Client) submit(req *SubmitRequest) (*SubmitResponse, error) {
 	var baseResp BaseResponse
 
 	err = c.getHttpClient(true).
-		Debug().
 		SetContentType("application/json;charset=UTF-8").
 		Post(uri).
 		AddParams("t", strconv.FormatInt(time.Now().UnixMilli(), 10)).
