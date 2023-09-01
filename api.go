@@ -189,8 +189,8 @@ func (c *Client) uploadCheck(uri string, auth string, filename string, uploadID 
 	return &resp, err
 }
 
-// 上传封面 https://member.bilibili.com/x/vu/web/cover/up
-func (c *Client) uploadCover(image string) (*UploadCoverResponse, error) {
+// UploadCover 上传封面 https://member.bilibili.com/x/vu/web/cover/up
+func (c *Client) UploadCover(image string) (*UploadCoverResponse, error) {
 	uri := "https://member.bilibili.com/x/vu/web/cover/up"
 
 	imageData, err := os.ReadFile(image)
@@ -219,8 +219,8 @@ func (c *Client) uploadCover(image string) (*UploadCoverResponse, error) {
 	return rsp, err
 }
 
-// 投稿 https://member.bilibili.com/x/vu/web/add/v3
-func (c *Client) submit(req *SubmitRequest) (*SubmitResponse, error) {
+// SubmitVideo 视频投稿 https://member.bilibili.com/x/vu/web/add/v3
+func (c *Client) SubmitVideo(req *SubmitRequest) (*SubmitResponse, error) {
 	uri := "https://member.bilibili.com/x/vu/web/add/v3"
 
 	req.CSRF = c.cookieCache["bili_jct"]

@@ -245,7 +245,7 @@ type SubmitRequest struct {
 	Recreate         int      `json:"recreate"`           // 二创视频 ？
 	Dynamic          string   `json:"dynamic"`            // 粉丝动态 ？
 	Interactive      int      `json:"interactive"`        // 是否是合作视频 ？
-	Videos           []Video  `json:"videos"`             // 视频 必须
+	Videos           []*Video `json:"videos"`             // 视频 必须
 	ActReserveCreate int      `json:"act_reserve_create"` // 允许二创 ？
 	NoDisturbance    int      `json:"no_disturbance"`     // ？
 	NoReprint        int      `json:"no_reprint"`         // ？

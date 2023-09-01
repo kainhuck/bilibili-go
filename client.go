@@ -99,9 +99,9 @@ func (c *Client) LoginWithQrCodeWithCache() {
 	_ = utils.SaveCookiesToFile(c.cookieFilePath, c.cookies)
 }
 
-// SubmitVideo 视频投稿 video 视频路径 cover 封面路径
-func (c *Client) SubmitVideo(video string, cover string) (*SubmitResponse, error) {
-	fileInfo, err := os.Stat(video)
+// UploadVideo 视频上传 videoPath 视频路径
+func (c *Client) UploadVideo(videoPath string) (*Video, error) {
+	fileInfo, err := os.Stat(videoPath)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (c *Client) SubmitVideo(video string, cover string) (*SubmitResponse, error
 	}
 
 	// 3. 分片上传
-	total, err := os.ReadFile(video)
+	total, err := os.ReadFile(videoPath)
 	if err != nil {
 		return nil, err
 	}
@@ -165,40 +165,12 @@ func (c *Client) SubmitVideo(video string, cover string) (*SubmitResponse, error
 		return nil, fmt.Errorf("[uploadCheck] upload failed code: %v", checkResp.OK)
 	}
 
-	// 上传封面
-	coverResp, err := c.uploadCover(cover)
-	if err != nil {
-		return nil, err
-	}
-
-	// 调用接口发布
-	return c.submit(&SubmitRequest{
-		Cover:        coverResp.Url,
-		Title:        strings.Split(fileInfo.Name(), ".")[0],
-		Copyright:    1,
-		TID:          229,
-		Tag:          "视频",
-		DescFormatID: 9999,
-		Desc:         "hello bilibili",
-		Recreate:     -1,
-		Dynamic:      "",
-		Interactive:  0,
-		Videos: []Video{
-			{
-				Filename: preResp.Filename(),
-				Title:    strings.Split(fileInfo.Name(), ".")[0],
-				Desc:     "",
-				CID:      preResp.BizID,
-			},
-		},
-		ActReserveCreate: 0,
-		NoDisturbance:    0,
-		NoReprint:        1,
-		Subtitle:         Subtitle{},
-		Dolby:            0,
-		LosslessMusic:    0,
-		WebOS:            2,
-	})
+	return &Video{
+		Filename: preResp.Filename(),
+		Title:    strings.Split(fileInfo.Name(), ".")[0],
+		Desc:     "",
+		CID:      preResp.BizID,
+	}, nil
 }
 
 /* ===================== helper ===================== */

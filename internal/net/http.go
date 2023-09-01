@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"strings"
 )
@@ -176,8 +175,7 @@ func (c *HttpClient) End() (resp *http.Response, body []byte, err error) {
 	}
 
 	if c.debug {
-		bts, _ := httputil.DumpRequest(request, true)
-		fmt.Printf("\n[REQUEST]\n%s\n", string(bts))
+		fmt.Printf("\n[REQUEST]\n%s\n", HttpDumpRequest(request))
 	}
 
 	resp, err = c.httpClient.Do(request)
@@ -187,8 +185,7 @@ func (c *HttpClient) End() (resp *http.Response, body []byte, err error) {
 	defer func() { _ = resp.Body.Close() }()
 
 	if c.debug {
-		bts, _ := httputil.DumpResponse(resp, true)
-		fmt.Printf("\n[RESPONSE]\n%s\n", string(bts))
+		fmt.Printf("\n[RESPONSE]\n%s\n", HttpDumpResponse(resp))
 	}
 
 	body, err = io.ReadAll(resp.Body)
