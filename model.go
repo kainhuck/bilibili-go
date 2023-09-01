@@ -237,12 +237,14 @@ type Subtitle struct {
 type SubmitRequest struct {
 	Cover            string   `json:"cover"`              // 封面 必须
 	Title            string   `json:"title"`              // 标题 必须
-	Copyright        int      `json:"copyright"`          // 是否原创 必须
+	Copyright        int      `json:"copyright"`          // 是否原创 必须 1 原创 2 转载
+	Source           string   `json:"source"`             // 如果选择转载则 将原视频链接贴这里
+	Dtime            int64    `json:"dtime"`              // 设置定时发布时间，时间戳，精确到秒，如不设置则立即发送
 	TID              int      `json:"tid"`                // 分类ID 必须
 	Tag              string   `json:"tag"`                // 标签 用逗号分隔 必须
 	DescFormatID     int      `json:"desc_format_id"`     // ？
 	Desc             string   `json:"desc"`               // 简介 必须
-	Recreate         int      `json:"recreate"`           // 二创视频 ？
+	Recreate         int      `json:"recreate"`           // 二创视频 -1 不允许二创 1 允许二创
 	Dynamic          string   `json:"dynamic"`            // 粉丝动态 ？
 	Interactive      int      `json:"interactive"`        // 是否是合作视频 ？
 	Videos           []*Video `json:"videos"`             // 视频 必须

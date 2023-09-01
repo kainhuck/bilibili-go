@@ -30,14 +30,13 @@ func SubmitVideo(client *bilibili_go.Client) {
 
 	// 3. 投稿
 	result, err := client.SubmitVideo(&bilibili_go.SubmitRequest{
-		Cover:        cover.Url,
-		Title:        "一起去郊游吧",
-		Copyright:    1,
-		TID:          229,
-		Tag:          "郊游",
-		DescFormatID: 9999,
-		Desc:         "我们一起去郊游吧",
-		Recreate:     -1,
+		Cover:     cover.Url,
+		Title:     "一起去郊游吧",
+		Copyright: 1,
+		TID:       229,
+		Tag:       "郊游",
+		Desc:      "我们一起去郊游吧",
+		Recreate:  -1,
 		Videos: []*bilibili_go.Video{
 			video,
 		},
