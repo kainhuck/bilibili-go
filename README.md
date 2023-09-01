@@ -1,6 +1,6 @@
 # bilibili-go
 
-![GitHub](https://img.shields.io/github/license/kainhuck/bilibili-go) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/kainhuck/bilibili-go) ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/kainhuck/bilibili-go)
+![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/kainhuck/bilibili-go) ![GitHub](https://img.shields.io/github/license/kainhuck/bilibili-go) ![GitHub tag (with filter)](https://img.shields.io/github/v/tag/kainhuck/bilibili-go)
 
 使用`bilibili-go`来顺畅的接入bilibili，支持视频投稿，个人信息查询...
 
