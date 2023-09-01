@@ -32,11 +32,13 @@ func (c *Client) qrcodePoll(qrcodeKey string) (*QrcodePollResponse, error) {
 	uri := "https://passport.bilibili.com/x/passport-login/web/qrcode/poll"
 
 	var baseResp BaseResponse
-	err := c.getHttpClient(false).Get(uri).AddParams("qrcode_key", qrcodeKey).EndStruct(&baseResp, func(response *http.Response) error {
-		c.cookies = response.Cookies()
+	err := c.getHttpClient(false).Get(uri).
+		AddParams("qrcode_key", qrcodeKey).
+		EndStruct(&baseResp, func(response *http.Response) error {
+			c.setCookies(response.Cookies())
 
-		return nil
-	})
+			return nil
+		})
 	if err != nil {
 		return nil, err
 	}

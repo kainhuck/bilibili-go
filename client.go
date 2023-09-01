@@ -35,6 +35,13 @@ func NewClient(opts ...Option) *Client {
 	}
 }
 
+func (c *Client) setCookies(cookies []*http.Cookie) {
+	c.cookies = cookies
+	for _, cookie := range cookies {
+		c.cookieCache[cookie.Name] = cookie.Value
+	}
+}
+
 // LoginWithQrCode 登陆这一步必须成功，否则后续接口无法访问
 func (c *Client) LoginWithQrCode() {
 	generateResp, err := c.qrcodeGenerate()
@@ -85,10 +92,7 @@ func (c *Client) LoginWithQrCodeWithCache() {
 		}
 
 		if len(cookies) != 0 {
-			c.cookies = cookies
-			for _, cookie := range cookies {
-				c.cookieCache[cookie.Name] = cookie.Value
-			}
+			c.setCookies(cookies)
 			logrus.Infof("load cookie from: %v", c.cookieFilePath)
 			return
 		}
