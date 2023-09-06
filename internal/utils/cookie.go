@@ -1,37 +1,29 @@
 package utils
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 )
 
-func SaveCookiesToFile(filename string, cookies []*http.Cookie) error {
-	file, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
+func DumpCookies(cookies []*http.Cookie) (string, error) {
+	var cookieDump []byte
+	buffer := bytes.NewBuffer(cookieDump)
 
 	for _, cookie := range cookies {
-		_, err := fmt.Fprintf(file, "%s=%s;%s\n", cookie.Name, cookie.Value, cookie.String())
+		_, err := fmt.Fprintf(buffer, "%s=%s;%s\n", cookie.Name, cookie.Value, cookie.String())
 		if err != nil {
-			return err
+			return "", err
 		}
 	}
 
-	return nil
+	return buffer.String(), nil
 }
 
-func LoadCookiesFromFile(filename string) ([]*http.Cookie, error) {
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-
+func LoadCookies(cookieDump string) ([]*http.Cookie, error) {
 	var cookies []*http.Cookie
-	lines := strings.Split(string(data), "\n")
+	lines := strings.Split(cookieDump, "\n")
 	for _, line := range lines {
 		cookie := parseCookie(line)
 		if cookie != nil {

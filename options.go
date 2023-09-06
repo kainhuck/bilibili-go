@@ -9,8 +9,8 @@ type options struct {
 	// HttpClient 自定义http客户端
 	HttpClient *http.Client
 
-	// CookieFilePath cookie缓存文件路径, 如果配置了则会缓存cookie，否则不缓存，默认为空
-	CookieFilePath string
+	// AuthFilePath cookie缓存文件路径, 如果配置了则会缓存cookie，否则不缓存，默认为空
+	AuthFilePath string
 
 	// Debug 是否开启调试模式，如果开启则会将http的请求信息输出到stdout
 	Debug bool
@@ -42,14 +42,14 @@ func WithHttpClient(client *http.Client) Option {
 	return httpClient{client: client}
 }
 
-type cookieFilePath string
+type authFilePath string
 
-func (path cookieFilePath) apply(opt *options) {
-	opt.CookieFilePath = string(path)
+func (path authFilePath) apply(opt *options) {
+	opt.AuthFilePath = string(path)
 }
 
-func WithCookieFilePath(path string) Option {
-	return cookieFilePath(path)
+func WithAuthFilePath(path string) Option {
+	return authFilePath(path)
 }
 
 type debug bool
@@ -65,9 +65,9 @@ func WithDebug(d bool) Option {
 /* ========================================================== */
 
 var defaultOptions = options{
-	UserAgent:      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
-	HttpClient:     http.DefaultClient,
-	CookieFilePath: "",
+	UserAgent:    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
+	HttpClient:   http.DefaultClient,
+	AuthFilePath: "",
 }
 
 func applyOptions(opts ...Option) *options {

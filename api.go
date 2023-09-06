@@ -36,7 +36,7 @@ func (c *Client) qrcodePoll(qrcodeKey string) (*QrcodePollResponse, error) {
 	err := c.getHttpClient(false).Get(uri).
 		AddParams("qrcode_key", qrcodeKey).
 		EndStruct(&baseResp, func(response *http.Response) error {
-			c.setCookies(response.Cookies())
+			c.setAuthInfo(&authInfo{Cookies: response.Cookies()})
 
 			return nil
 		})

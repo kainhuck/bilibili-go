@@ -6,7 +6,6 @@ import (
 	"github.com/kainhuck/bilibili-go/internal/utils"
 	"github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
-	"net/http"
 	"os"
 	"strings"
 	"sync"
@@ -15,9 +14,9 @@ import (
 
 type Client struct {
 	httpClient       *net.HttpClient
-	cookies          []*http.Cookie
+	authInfo         *authInfo
 	cookieCache      map[string]string
-	cookieFilePath   string
+	authFilePath     string
 	wbiKey           string
 	wbiKeyLastUpdate time.Time
 	debug            bool
@@ -26,37 +25,40 @@ type Client struct {
 func NewClient(opts ...Option) *Client {
 	opt := applyOptions(opts...)
 
-	cookies, _ := utils.LoadCookiesFromFile(opt.CookieFilePath)
+	auth, _ := loadAuthInfoFromFile(opt.AuthFilePath)
 
 	client := net.NewHttpClient(opt.HttpClient).SetUserAgent(opt.UserAgent)
 
 	return &Client{
-		httpClient:     client,
-		cookies:        cookies,
-		cookieCache:    make(map[string]string),
-		cookieFilePath: opt.CookieFilePath,
-		debug:          opt.Debug,
+		httpClient:   client,
+		authInfo:     auth,
+		cookieCache:  make(map[string]string),
+		authFilePath: opt.AuthFilePath,
+		debug:        opt.Debug,
 	}
 }
 
-func (c *Client) setCookies(cookies []*http.Cookie) {
-	c.cookies = cookies
-	for _, cookie := range cookies {
+func (c *Client) setAuthInfo(auth *authInfo) {
+	c.authInfo = auth
+	if c.authInfo == nil {
+		return
+	}
+	for _, cookie := range c.authInfo.Cookies {
 		c.cookieCache[cookie.Name] = cookie.Value
 	}
 }
 
-func (c *Client) loadCookieFromFile() bool {
-	if utils.FileExists(c.cookieFilePath) {
-		cookies, err := utils.LoadCookiesFromFile(c.cookieFilePath)
+func (c *Client) loadAuthInfoFromFile() bool {
+	if utils.FileExists(c.authFilePath) {
+		auth, err := loadAuthInfoFromFile(c.authFilePath)
 		if err != nil {
-			logrus.Errorf("load cookie from file: %v failed: %v", c.cookieFilePath, err)
+			logrus.Errorf("load auth info from file: %v failed: %v", c.authFilePath, err)
 			return false
 		}
 
-		if len(cookies) != 0 {
-			c.setCookies(cookies)
-			logrus.Infof("load cookie from: %v", c.cookieFilePath)
+		if auth != nil {
+			c.setAuthInfo(auth)
+			logrus.Infof("load auth info from: %v", c.authFilePath)
 			return true
 		}
 	}
@@ -92,11 +94,11 @@ func (c *Client) getWbiKeyCached() string {
 
 // LoginWithQrCode 登陆这一步必须成功，否则后续接口无法访问
 func (c *Client) LoginWithQrCode() {
-	if c.loadCookieFromFile() {
+	if c.loadAuthInfoFromFile() {
 		return
 	}
 
-	defer func() { _ = utils.SaveCookiesToFile(c.cookieFilePath, c.cookies) }()
+	defer func() { _ = saveAuthInfoToFile(c.authFilePath, c.authInfo) }()
 
 	generateResp, err := c.qrcodeGenerate()
 	if err != nil {
@@ -125,6 +127,7 @@ func (c *Client) LoginWithQrCode() {
 
 		switch resp.Code {
 		case 0:
+			c.authInfo.RefreshToken = resp.RefreshToken
 			logrus.Infof("login success!!!")
 			return
 		case 86038:
@@ -218,8 +221,8 @@ func (c *Client) getHttpClient(auth bool) *net.HttpClient {
 		client = client.Debug()
 	}
 
-	if auth {
-		client = client.SetCookies(c.cookies)
+	if auth && c.authInfo != nil {
+		client = client.SetCookies(c.authInfo.Cookies)
 	}
 
 	return client
