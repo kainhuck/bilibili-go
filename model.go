@@ -259,6 +259,7 @@ type SubmitResponse struct {
 	Bvid string `json:"bvid"`
 }
 
+// GetCoinResponse 用户硬币信息
 type GetCoinResponse struct {
 	Money float64 `json:"money"`
 }
@@ -396,4 +397,101 @@ type GetSpaceInfoResponse struct {
 		IsFollowDisplay bool `json:"is_follow_display"`
 	} `json:"contract"`
 	CertificateShow bool `json:"certificate_show"` // ？
+}
+
+// GetUserCardResponse 用户名片信息
+type GetUserCardResponse struct {
+	Card struct {
+		Mid         string        `json:"mid"`           // mid
+		Name        string        `json:"name"`          // 昵称
+		Approve     bool          `json:"approve"`       // ？
+		Sex         string        `json:"sex"`           // 性别 男 女 保密
+		Rank        string        `json:"rank"`          // 等级
+		Face        string        `json:"face"`          // 用户头像链接
+		FaceNft     int           `json:"face_nft"`      // 是否是nft头像 0 否 1 是
+		FaceNftType int           `json:"face_nft_type"` // nft头像类别？
+		DisplayRank string        `json:"DisplayRank"`   // ？
+		Regtime     int64         `json:"regtime"`       // ？
+		Spacesta    int           `json:"spacesta"`      // ？
+		Birthday    string        `json:"birthday"`      // 空
+		Place       string        `json:"place"`         // 空
+		Description string        `json:"description"`   // 空
+		Article     int           `json:"article"`       // 0
+		Attentions  []interface{} `json:"attentions"`    // 空
+		Fans        int           `json:"fans"`          // 粉丝数
+		Friend      int           `json:"friend"`        // 关注数
+		Attention   int           `json:"attention"`     // 关注数
+		Sign        string        `json:"sign"`          // 签名
+		LevelInfo   struct {      // 等级信息
+			CurrentLevel int `json:"current_level"`
+			CurrentMin   int `json:"current_min"`
+			CurrentExp   int `json:"current_exp"`
+			NextExp      int `json:"next_exp"`
+		} `json:"level_info"`
+		Pendant struct { // 挂件
+			Pid               int    `json:"pid"`
+			Name              string `json:"na"`
+			Expire            int    `json:"expire"`
+			ImageEnhance      string `json:"image_enhance"`
+			ImageEnhanceFrame string `json:"image_enhance_frame"`
+		} `json:"pendant"`
+		Nameplate struct { // 勋章
+			Nid        int    `json:"nid"`
+			Name       string `json:"name"`
+			Image      string `json:"image"`
+			ImageSmall string `json:"image_small"`
+			Level      string `json:"level"`
+			Condition  string `json:"condition"`
+		} `json:"nameplate"`
+		Official struct { // 认证信息
+			Role  int    `json:"role"`
+			Title string `json:"title"`
+			Desc  string `json:"desc"`
+			Type  int    `json:"type"`
+		} `json:"Official"`
+		OfficialVerify struct { // 认证信息2
+			Type int    `json:"type"`
+			Desc string `json:"desc"`
+		} `json:"official_verify"`
+		VIP struct { // 会员信息
+			Type      int   `json:"type"`
+			Status    int   `json:"status"`
+			DueDate   int64 `json:"due_date"`
+			PayType   int   `json:"vip_pay_type"`
+			ThemeType int   `json:"theme_type"`
+			Label     struct {
+				Path                  string `json:"path"`
+				Text                  string `json:"text"`
+				LabelTheme            string `json:"label_theme"`
+				TextColor             string `json:"text_color"`
+				BgStyle               int    `json:"bg_style"`
+				BgColor               string `json:"bg_color"`
+				BorderColor           string `json:"border_color"`
+				UseImgLabel           bool   `json:"use_img_label"`
+				ImgLabelUriHans       string `json:"img_label_uri_hans"`
+				ImgLabelUriHant       string `json:"img_label_uri_hant"`
+				ImgLabelUriHansStatic string `json:"img_label_uri_hans_static"`
+				ImgLabelUriHantStatic string `json:"img_label_uri_hant_static"`
+			} `json:"label"`
+			AvatarSubscript    int    `json:"avatar_subscript"`
+			NicknameColor      string `json:"nickname_color"`
+			Role               int    `json:"role"`
+			AvatarSubscriptUrl string `json:"avatar_subscript_url"`
+			TVVIPStatus        int    `json:"tv_vip_status"`
+			TVVIPPayType       int    `json:"tv_vip_pay_type"`
+			TVDueDate          int64  `json:"tv_due_date"`
+			VIPType            int    `json:"vipType"`
+			VIPStatus          int    `json:"vipStatus"`
+		} `json:"vip"`
+		IsSeniorMember int `json:"is_senior_member"`
+	} `json:"card"` // 卡片信息
+	Space struct { // 主页图像
+		SImg string `json:"s_img"`
+		LImg string `json:"l_img"`
+	} `json:"space"`
+	Following    bool `json:"following"`     // 是否关注此用户 需登陆
+	ArchiveCount int  `json:"archive_count"` // 用户稿件数
+	ArticleCount int  `json:"article_count"` // ？
+	Follower     int  `json:"follower"`      // 粉丝数
+	LikeNum      int  `json:"like_num"`      // 点赞数
 }

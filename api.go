@@ -297,3 +297,28 @@ func (c *Client) GetSpaceInfo(mid string) (*GetSpaceInfoResponse, error) {
 
 	return rsp, err
 }
+
+// GetUserCard 用户名片信息 https://api.bilibili.com/x/web-interface/card
+//
+//	mid 用户mid
+//	photo 是否请求用户主页头像
+func (c *Client) GetUserCard(mid string, photo bool) (*GetUserCardResponse, error) {
+	uri := "https://api.bilibili.com/x/web-interface/card"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("mid", mid).
+		AddParams("photo", strconv.FormatBool(photo)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &GetUserCardResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
