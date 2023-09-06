@@ -22,6 +22,10 @@
 3. 使用包
     参考 👉[demo](test/main.go)
 
+## 特别鸣谢 🥰
+
+[bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
+
 ## 更新日志 🐥
 
 ### v0.1.0
