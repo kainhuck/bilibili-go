@@ -9,15 +9,15 @@ import (
 func main() {
 	client := bilibili_go.NewClient(
 		bilibili_go.WithCookieFilePath("bilibili_cookie.hyk.txt"),
-		bilibili_go.WithDebug(true),
+		bilibili_go.WithDebug(false),
 	)
 	client.LoginWithQrCode()
 
-	resp, err := client.GetUserInfo(424680400)
+	resp, err := client.GetUserCard("88888888", true)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(resp.Name)
+	fmt.Println(resp.Card.Name, resp.Follower)
 
 	//SubmitVideo(client)
 }

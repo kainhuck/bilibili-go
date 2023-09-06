@@ -276,11 +276,11 @@ func (c *Client) GetCoin() (*GetCoinResponse, error) {
 }
 
 // GetUserInfo 用户空间详细信息 https://api.bilibili.com/x/space/wbi/acc/info
-func (c *Client) GetUserInfo(mid int) (*GetUserInfoResponse, error) {
+func (c *Client) GetUserInfo(mid string) (*GetUserInfoResponse, error) {
 	uri := "https://api.bilibili.com/x/space/wbi/acc/info"
 
 	params := make(url.Values)
-	params.Add("mid", strconv.Itoa(mid))
+	params.Add("mid", mid)
 	encWbi(params, c.getWbiKeyCached())
 
 	var baseResp BaseResponse
