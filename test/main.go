@@ -7,7 +7,10 @@ import (
 )
 
 func main() {
-	client := bilibili_go.NewClient(bilibili_go.WithCookieFilePath("bilibili_cookie.hyk.txt"))
+	client := bilibili_go.NewClient(
+		bilibili_go.WithCookieFilePath("bilibili_cookie.hyk.txt"),
+		bilibili_go.WithDebug(true),
+	)
 	client.LoginWithQrCode()
 
 	resp, err := client.GetSpaceInfo("74429422")

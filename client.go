@@ -20,6 +20,7 @@ type Client struct {
 	cookieFilePath   string
 	wbiKey           string
 	wbiKeyLastUpdate time.Time
+	debug            bool
 }
 
 func NewClient(opts ...Option) *Client {
@@ -34,6 +35,7 @@ func NewClient(opts ...Option) *Client {
 		cookies:        cookies,
 		cookieCache:    make(map[string]string),
 		cookieFilePath: opt.CookieFilePath,
+		debug:          opt.Debug,
 	}
 }
 
@@ -212,8 +214,12 @@ func (c *Client) UploadVideo(videoPath string) (*Video, error) {
 func (c *Client) getHttpClient(auth bool) *net.HttpClient {
 	client := c.httpClient.Clone()
 
+	if c.debug {
+		client = client.Debug()
+	}
+
 	if auth {
-		client.SetCookies(c.cookies)
+		client = client.SetCookies(c.cookies)
 	}
 
 	return client

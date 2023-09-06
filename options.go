@@ -11,6 +11,9 @@ type options struct {
 
 	// CookieFilePath cookie缓存文件路径, 如果配置了则会缓存cookie，否则不缓存，默认为空
 	CookieFilePath string
+
+	// Debug 是否开启调试模式，如果开启则会将http的请求信息输出到stdout
+	Debug bool
 }
 
 type Option interface {
@@ -47,6 +50,16 @@ func (path cookieFilePath) apply(opt *options) {
 
 func WithCookieFilePath(path string) Option {
 	return cookieFilePath(path)
+}
+
+type debug bool
+
+func (d debug) apply(opt *options) {
+	opt.Debug = bool(d)
+}
+
+func WithDebug(d bool) Option {
+	return debug(d)
 }
 
 /* ========================================================== */
