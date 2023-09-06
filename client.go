@@ -119,7 +119,7 @@ func (c *Client) LoginWithQrCode() {
 	}
 
 	for {
-		resp, err := c.qrcodePoll(generateResp.QrcodeKey)
+		resp, cookies, err := c.qrcodePoll(generateResp.QrcodeKey)
 		if err != nil {
 			logrus.Errorf("poll qrcode failed")
 			os.Exit(-1)
@@ -127,7 +127,10 @@ func (c *Client) LoginWithQrCode() {
 
 		switch resp.Code {
 		case 0:
-			c.authInfo.RefreshToken = resp.RefreshToken
+			c.setAuthInfo(&authInfo{
+				Cookies:      cookies,
+				RefreshToken: resp.RefreshToken,
+			})
 			logrus.Infof("login success!!!")
 			return
 		case 86038:

@@ -29,25 +29,27 @@ func (c *Client) qrcodeGenerate() (*QrcodeGenerateResponse, error) {
 }
 
 // 查询二维码扫描状态 https://passport.bilibili.com/x/passport-login/web/qrcode/poll
-func (c *Client) qrcodePoll(qrcodeKey string) (*QrcodePollResponse, error) {
+func (c *Client) qrcodePoll(qrcodeKey string) (*QrcodePollResponse, []*http.Cookie, error) {
 	uri := "https://passport.bilibili.com/x/passport-login/web/qrcode/poll"
 
 	var baseResp BaseResponse
+	var cookies []*http.Cookie
+
 	err := c.getHttpClient(false).Get(uri).
 		AddParams("qrcode_key", qrcodeKey).
 		EndStruct(&baseResp, func(response *http.Response) error {
-			c.setAuthInfo(&authInfo{Cookies: response.Cookies()})
+			cookies = response.Cookies()
 
 			return nil
 		})
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	rsp := &QrcodePollResponse{}
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
-	return rsp, err
+	return rsp, cookies, err
 }
 
 // GetAccount 获取个人账号信息 https://api.bilibili.com/x/member/web/account
