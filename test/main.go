@@ -13,11 +13,7 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	resp, err := client.GetUserCard("88888888", true)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(resp.Card.Name, resp.Follower)
+	SearchUserInfo(client)
 
 	//SubmitVideo(client)
 }
@@ -57,4 +53,21 @@ func SubmitVideo(client *bilibili_go.Client) {
 		log.Fatal(err)
 	}
 	log.Printf("投稿成功🏅️AV号: %v, BV号: %v\n", result.Aid, result.Bvid)
+}
+
+// SearchUserInfo 查询用户信息
+func SearchUserInfo(client *bilibili_go.Client) {
+	// 1. 根据mid查询其他用户信息
+	card, err := client.GetUserCard("2", true)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("用户名：%v，粉丝数：%v\n", card.Card.Name, card.Card.Fans)
+
+	// 2. 查询自身信息
+	resp, err := client.GetMyInfo()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("用户名：%v，粉丝数：%v，硬币数：%v\n", resp.Name, resp.Follower, resp.Coins)
 }
