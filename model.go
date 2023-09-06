@@ -495,3 +495,78 @@ type GetUserCardResponse struct {
 	Follower     int  `json:"follower"`      // 粉丝数
 	LikeNum      int  `json:"like_num"`      // 点赞数
 }
+
+// GetMyInfoResponse 登陆用户个人详细信息
+type GetMyInfoResponse struct {
+	Mid            int    `json:"mid"`             // mid
+	Name           string `json:"name"`            // 昵称
+	Sex            string `json:"sex"`             // 性别 男 女 保密
+	Face           string `json:"face"`            // 头像图片url
+	Sign           string `json:"sign"`            // 签名
+	Rank           int    `json:"rank"`            // 10000
+	Level          int    `json:"level"`           // 当前等级 0-6
+	JoinTime       int    `json:"jointime"`        // 0 ?
+	Moral          int    `json:"moral"`           // 节操 默认70
+	Silence        int    `json:"silence"`         // 封禁状态 0 正常 1 被封
+	EmailStatus    int    `json:"email_status"`    // 已验证邮箱 0 未验证 1 已验证
+	TelStatus      int    `json:"tel_status"`      // 已验证手机号 0 未验证 1 已验证
+	Identification int    `json:"identification"`  // 1 ？
+	Birthday       int64  `json:"birthday"`        // 生日
+	IsTourist      int    `json:"is_tourist"`      // 0 ？
+	IsFakeAccount  int    `json:"is_fake_account"` // 0 ？
+	PinPrompting   int    `json:"pin_prompting"`   // 0 ？
+	IsDeleted      int    `json:"is_deleted"`      // 0 ？
+	InRegAudit     int    `json:"in_reg_audit"`    // ？
+	IsRipUser      bool   `json:"is_rip_user"`     // ？
+	Profession     struct {
+		ID              int    `json:"id"`
+		Name            string `json:"name"`
+		ShowName        string `json:"show_name"`
+		IsShow          int    `json:"is_show"`
+		CategoryOne     string `json:"category_one"`
+		Realname        string `json:"realname"`
+		Title           string `json:"title"`
+		Department      string `json:"department"`
+		CertificateNo   string `json:"certificate_no"`
+		CertificateShow bool   `json:"certificate_show"`
+	} `json:"profession"`
+	FaceNft        int `json:"face_nft"`
+	FaceNftNew     int `json:"face_nft_new"`
+	IsSeniorMember int `json:"is_senior_member"`
+	Honours        struct {
+		Mid    int `json:"mid"`
+		Colour struct {
+			Dark   string `json:"dark"`
+			Normal string `json:"normal"`
+		} `json:"colour"`
+		Tags interface{} `json:"tags"`
+	} `json:"honours"`
+	DigitalID   string `json:"digital_id"`
+	DigitalType int    `json:"digital_type"`
+	Attestation struct {
+		Type       int `json:"type"`
+		CommonInfo struct {
+			Title       string `json:"title"`
+			Prefix      string `json:"prefix"`
+			PrefixTitle string `json:"prefix_title"`
+		} `json:"common_info"`
+		SpliceInfo struct {
+			Title string `json:"title"`
+		} `json:"splice_info"`
+		Icon string `json:"icon"`
+		Desc string `json:"desc"`
+	} `json:"attestation"`
+	ExpertInfo struct {
+		Title string `json:"title"`
+	} `json:"expert_info"`
+	LevelExp struct { // 等级经验
+		CurrentLevel int   `json:"current_level"`
+		CurrentMin   int   `json:"current_min"`
+		CurrentExp   int   `json:"current_exp"`
+		NextExp      int   `json:"next_exp"`
+		LevelUp      int64 `json:"level_up"`
+	} `json:"level_exp"`
+	Coins     float64 `json:"coins"`     // 硬币
+	Following int     `json:"following"` // 粉丝数
+	Follower  int     `json:"follower"`  // 粉丝数
+}

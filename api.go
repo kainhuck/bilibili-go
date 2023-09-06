@@ -322,3 +322,22 @@ func (c *Client) GetUserCard(mid string, photo bool) (*GetUserCardResponse, erro
 
 	return rsp, err
 }
+
+// GetMyInfo 登陆用户空间详细信息 https://api.bilibili.com/x/space/myinfo
+func (c *Client) GetMyInfo() (*GetMyInfoResponse, error) {
+	uri := "https://api.bilibili.com/x/space/myinfo"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &GetMyInfoResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
