@@ -42,8 +42,32 @@ func (c *Client) setCookies(cookies []*http.Cookie) {
 	}
 }
 
+func (c *Client) loadCookieFromFile() bool {
+	if utils.FileExists(c.cookieFilePath) {
+		cookies, err := utils.LoadCookiesFromFile(c.cookieFilePath)
+		if err != nil {
+			logrus.Errorf("load cookie from file: %v failed: %v", c.cookieFilePath, err)
+			return false
+		}
+
+		if len(cookies) != 0 {
+			c.setCookies(cookies)
+			logrus.Infof("load cookie from: %v", c.cookieFilePath)
+			return true
+		}
+	}
+
+	return false
+}
+
 // LoginWithQrCode 登陆这一步必须成功，否则后续接口无法访问
 func (c *Client) LoginWithQrCode() {
+	if c.loadCookieFromFile() {
+		return
+	}
+
+	defer func() { _ = utils.SaveCookiesToFile(c.cookieFilePath, c.cookies) }()
+
 	generateResp, err := c.qrcodeGenerate()
 	if err != nil {
 		logrus.Errorf("generate qrcode failed")
@@ -79,28 +103,6 @@ func (c *Client) LoginWithQrCode() {
 		}
 		time.Sleep(1 * time.Second)
 	}
-}
-
-// LoginWithQrCodeWithCache 带有缓存的二维码登陆
-func (c *Client) LoginWithQrCodeWithCache() {
-
-	if utils.FileExists(c.cookieFilePath) {
-		cookies, err := utils.LoadCookiesFromFile(c.cookieFilePath)
-		if err != nil {
-			logrus.Errorf("load cookie from file: %v failed: %v", c.cookieFilePath, err)
-			os.Exit(-1)
-		}
-
-		if len(cookies) != 0 {
-			c.setCookies(cookies)
-			logrus.Infof("load cookie from: %v", c.cookieFilePath)
-			return
-		}
-	}
-
-	c.LoginWithQrCode()
-
-	_ = utils.SaveCookiesToFile(c.cookieFilePath, c.cookies)
 }
 
 // UploadVideo 视频上传 videoPath 视频路径

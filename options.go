@@ -9,7 +9,7 @@ type options struct {
 	// HttpClient 自定义http客户端
 	HttpClient *http.Client
 
-	// CookieFilePath cookie缓存文件路径
+	// CookieFilePath cookie缓存文件路径, 如果配置了则会缓存cookie，否则不缓存，默认为空
 	CookieFilePath string
 }
 
@@ -54,7 +54,7 @@ func WithCookieFilePath(path string) Option {
 var defaultOptions = options{
 	UserAgent:      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
 	HttpClient:     http.DefaultClient,
-	CookieFilePath: "bilibili_cookie.txt",
+	CookieFilePath: "",
 }
 
 func applyOptions(opts ...Option) *options {

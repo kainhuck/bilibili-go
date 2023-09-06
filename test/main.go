@@ -1,15 +1,22 @@
 package main
 
 import (
+	"fmt"
 	bilibili_go "github.com/kainhuck/bilibili-go"
 	"log"
 )
 
 func main() {
-	client := bilibili_go.NewClient()
-	client.LoginWithQrCodeWithCache()
+	client := bilibili_go.NewClient(bilibili_go.WithCookieFilePath("bilibili_cookie.txt"))
+	client.LoginWithQrCode()
 
-	SubmitVideo(client)
+	resp, err := client.GetNavigationStatus()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(resp)
+
+	//SubmitVideo(client)
 }
 
 // SubmitVideo 视频投稿
