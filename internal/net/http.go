@@ -119,6 +119,12 @@ func (c *HttpClient) SetParams(key string, value string) *HttpClient {
 	return c
 }
 
+func (c *HttpClient) CoverParams(params url.Values) *HttpClient {
+	c.params = params
+
+	return c
+}
+
 func (c *HttpClient) SetHeader(key string, value string) *HttpClient {
 	c.header[key] = value
 

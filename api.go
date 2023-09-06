@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"time"
@@ -269,6 +270,29 @@ func (c *Client) GetCoin() (*GetCoinResponse, error) {
 	}
 
 	rsp := &GetCoinResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetSpaceInfo 用户空间详细信息 https://api.bilibili.com/x/space/wbi/acc/info
+func (c *Client) GetSpaceInfo(mid string) (*GetSpaceInfoResponse, error) {
+	uri := "https://api.bilibili.com/x/space/wbi/acc/info"
+
+	params := make(url.Values)
+	params.Add("mid", mid)
+	encWbi(params, c.getWbiKeyCached())
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).CoverParams(params).EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &GetSpaceInfoResponse{}
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
 	return rsp, err

@@ -14,10 +14,12 @@ import (
 )
 
 type Client struct {
-	httpClient     *net.HttpClient
-	cookies        []*http.Cookie
-	cookieCache    map[string]string
-	cookieFilePath string
+	httpClient       *net.HttpClient
+	cookies          []*http.Cookie
+	cookieCache      map[string]string
+	cookieFilePath   string
+	wbiKey           string
+	wbiKeyLastUpdate time.Time
 }
 
 func NewClient(opts ...Option) *Client {
@@ -58,6 +60,32 @@ func (c *Client) loadCookieFromFile() bool {
 	}
 
 	return false
+}
+
+func (c *Client) getWbiKey() string {
+	resp, err := c.GetNavigation()
+	if err != nil {
+		return ""
+	}
+
+	imgKey := strings.Split(strings.Split(resp.WBIImg.ImgURL, "/")[len(strings.Split(resp.WBIImg.ImgURL, "/"))-1], ".")[0]
+	subKey := strings.Split(strings.Split(resp.WBIImg.SubURL, "/")[len(strings.Split(resp.WBIImg.SubURL, "/"))-1], ".")[0]
+	return getMixinKey(imgKey + subKey)
+}
+
+func (c *Client) updateWbiKeyCache() {
+	if time.Since(c.wbiKeyLastUpdate).Minutes() < 10 {
+		return
+	}
+
+	c.wbiKey = c.getWbiKey()
+	c.wbiKeyLastUpdate = time.Now()
+}
+
+func (c *Client) getWbiKeyCached() string {
+	c.updateWbiKeyCache()
+
+	return c.wbiKey
 }
 
 // LoginWithQrCode 登陆这一步必须成功，否则后续接口无法访问

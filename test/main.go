@@ -10,11 +10,11 @@ func main() {
 	client := bilibili_go.NewClient(bilibili_go.WithCookieFilePath("bilibili_cookie.hyk.txt"))
 	client.LoginWithQrCode()
 
-	resp, err := client.GetCoin()
+	resp, err := client.GetSpaceInfo("74429422")
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(resp)
+	fmt.Println(resp.Name, resp.Birthday)
 
 	//SubmitVideo(client)
 }
