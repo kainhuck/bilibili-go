@@ -13,11 +13,11 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	resp, err := client.GetMyInfo()
+	resp, err := client.GetUserInfo(424680400)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(resp.Follower)
+	fmt.Println(resp.Name)
 
 	//SubmitVideo(client)
 }

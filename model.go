@@ -264,8 +264,8 @@ type GetCoinResponse struct {
 	Money float64 `json:"money"`
 }
 
-// GetSpaceInfoResponse 用户空间信息
-type GetSpaceInfoResponse struct {
+// GetUserInfoResponse 用户空间信息
+type GetUserInfoResponse struct {
 	Mid         int      `json:"mid"`           // mid
 	Name        string   `json:"name"`          // 昵称
 	Sex         string   `json:"sex"`           // 性别 男 女 保密

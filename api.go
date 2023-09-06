@@ -275,12 +275,12 @@ func (c *Client) GetCoin() (*GetCoinResponse, error) {
 	return rsp, err
 }
 
-// GetSpaceInfo 用户空间详细信息 https://api.bilibili.com/x/space/wbi/acc/info
-func (c *Client) GetSpaceInfo(mid string) (*GetSpaceInfoResponse, error) {
+// GetUserInfo 用户空间详细信息 https://api.bilibili.com/x/space/wbi/acc/info
+func (c *Client) GetUserInfo(mid int) (*GetUserInfoResponse, error) {
 	uri := "https://api.bilibili.com/x/space/wbi/acc/info"
 
 	params := make(url.Values)
-	params.Add("mid", mid)
+	params.Add("mid", strconv.Itoa(mid))
 	encWbi(params, c.getWbiKeyCached())
 
 	var baseResp BaseResponse
@@ -292,7 +292,7 @@ func (c *Client) GetSpaceInfo(mid string) (*GetSpaceInfoResponse, error) {
 		return nil, fmt.Errorf(baseResp.Message)
 	}
 
-	rsp := &GetSpaceInfoResponse{}
+	rsp := &GetUserInfoResponse{}
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
 	return rsp, err
