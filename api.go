@@ -254,3 +254,22 @@ func (c *Client) SubmitVideo(req *SubmitRequest) (*SubmitResponse, error) {
 
 	return rsp, err
 }
+
+// GetCoin 获取硬币数 https://account.bilibili.com/site/getCoin
+func (c *Client) GetCoin() (*GetCoinResponse, error) {
+	uri := "https://account.bilibili.com/site/getCoin"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &GetCoinResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}

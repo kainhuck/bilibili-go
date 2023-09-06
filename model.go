@@ -61,38 +61,38 @@ type AccountResponse struct {
 
 // NavigationResponse for navigation response
 type NavigationResponse struct {
-	AllowanceCount     int            `json:"allowance_count"`
-	AnswerStatus       int            `json:"answer_status"`
-	EmailVerified      int            `json:"email_verified"`
-	Face               string         `json:"face"`
-	FaceNFT            int            `json:"face_nft"`
-	FaceNFTType        int            `json:"face_nft_type"`
-	HasShop            bool           `json:"has_shop"`
-	IsLogin            bool           `json:"isLogin"`
-	IsJury             bool           `json:"is_jury"`
-	IsSeniorMember     int            `json:"is_senior_member"`
-	LevelInfo          LevelInfo      `json:"level_info"`
-	Mid                int            `json:"mid"`
-	MobileVerified     int            `json:"mobile_verified"`
-	Money              float64        `json:"money"`
-	Moral              int            `json:"moral"`
-	Official           Official       `json:"official"`
-	OfficialVerify     OfficialVerify `json:"officialVerify"`
-	Pendant            Pendant        `json:"pendant"`
-	Scores             int            `json:"scores"`
-	ShopURL            string         `json:"shop_url"`
-	UName              string         `json:"uname"`
-	VIP                VIP            `json:"vip"`
-	VIPDueDate         int64          `json:"vipDueDate"`
-	VIPStatus          int            `json:"vipStatus"`
-	VIPType            int            `json:"vipType"`
-	VIPAvatarSubscript int            `json:"vip_avatar_subscript"`
-	VIPLabel           Label          `json:"vip_label"`
-	VIPNicknameColor   string         `json:"vip_nickname_color"`
-	VIPPayType         int            `json:"vip_pay_type"`
-	VIPThemeType       int            `json:"vip_theme_type"`
-	Wallet             Wallet         `json:"wallet"`
-	WBIImg             WBIImage       `json:"wbi_img"`
+	AllowanceCount     int            `json:"allowance_count"`      // ？
+	AnswerStatus       int            `json:"answer_status"`        // ？
+	EmailVerified      int            `json:"email_verified"`       // 是否验证邮箱地址，0 未验证 1 已验证
+	Face               string         `json:"face"`                 // 头像
+	FaceNFT            int            `json:"face_nft"`             // ？
+	FaceNFTType        int            `json:"face_nft_type"`        // ？
+	HasShop            bool           `json:"has_shop"`             // 是否拥有推广商品 true 有 false 无
+	IsLogin            bool           `json:"isLogin"`              // 是否已登陆 true 已登陆 false 未登录
+	IsJury             bool           `json:"is_jury"`              // 是否是风纪委员 true 是 false 不是
+	IsSeniorMember     int            `json:"is_senior_member"`     // 是否是硬核会员 0 不是 1 是
+	LevelInfo          LevelInfo      `json:"level_info"`           // 等级信息
+	Mid                int            `json:"mid"`                  // 用户 mid
+	MobileVerified     int            `json:"mobile_verified"`      // 是否验证手机号 0 未验证 1 已验证
+	Money              float64        `json:"money"`                // 硬币数
+	Moral              int            `json:"moral"`                // 当前节操值 上限70
+	Official           Official       `json:"official"`             // 认证信息
+	OfficialVerify     OfficialVerify `json:"officialVerify"`       // 认证信息2
+	Pendant            Pendant        `json:"pendant"`              // 头像框信息
+	Scores             int            `json:"scores"`               // ？
+	ShopURL            string         `json:"shop_url"`             // 商品推广页url
+	UName              string         `json:"uname"`                // 用户昵称
+	VIP                VIP            `json:"vip"`                  // 会员信息
+	VIPDueDate         int64          `json:"vipDueDate"`           // 会员到期时间 毫秒时间戳
+	VIPStatus          int            `json:"vipStatus"`            // 会员开通状态 0 无 1 有
+	VIPType            int            `json:"vipType"`              // 会员类型 0 无 1 月度大会员 2 年度及以上大会员
+	VIPAvatarSubscript int            `json:"vip_avatar_subscript"` // 是否显示会员图标 0 不显示 1 显示
+	VIPLabel           Label          `json:"vip_label"`            // 会员标签
+	VIPNicknameColor   string         `json:"vip_nickname_color"`   // 会员昵称颜色 颜色码
+	VIPPayType         int            `json:"vip_pay_type"`         // 会员开通状态 0 无 1 有
+	VIPThemeType       int            `json:"vip_theme_type"`       // ？
+	Wallet             Wallet         `json:"wallet"`               // B币钱包信息
+	WBIImg             WBIImage       `json:"wbi_img"`              // Wbi签名实时口令
 }
 
 type LevelInfo struct {
@@ -262,4 +262,8 @@ type SubmitRequest struct {
 type SubmitResponse struct {
 	Aid  int64  `json:"aid"`
 	Bvid string `json:"bvid"`
+}
+
+type GetCoinResponse struct {
+	Money float64 `json:"money"`
 }

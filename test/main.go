@@ -7,10 +7,10 @@ import (
 )
 
 func main() {
-	client := bilibili_go.NewClient(bilibili_go.WithCookieFilePath("bilibili_cookie.txt"))
+	client := bilibili_go.NewClient(bilibili_go.WithCookieFilePath("bilibili_cookie.hyk.txt"))
 	client.LoginWithQrCode()
 
-	resp, err := client.GetNavigationStatus()
+	resp, err := client.GetCoin()
 	if err != nil {
 		log.Fatal(err)
 	}
