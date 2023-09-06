@@ -12,6 +12,11 @@ import (
 	"time"
 )
 
+type debugInfo struct {
+	debug  bool
+	output *os.File
+}
+
 type Client struct {
 	httpClient       *net.HttpClient
 	authInfo         *authInfo
@@ -19,7 +24,7 @@ type Client struct {
 	authFilePath     string
 	wbiKey           string
 	wbiKeyLastUpdate time.Time
-	debug            bool
+	debug            *debugInfo
 }
 
 func NewClient(opts ...Option) *Client {
@@ -220,8 +225,8 @@ func (c *Client) UploadVideo(videoPath string) (*Video, error) {
 func (c *Client) getHttpClient(auth bool) *net.HttpClient {
 	client := c.httpClient.Clone()
 
-	if c.debug {
-		client = client.Debug()
+	if c.debug.debug {
+		client = client.Debug(c.debug.output)
 	}
 
 	if auth && c.authInfo != nil {

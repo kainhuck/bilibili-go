@@ -4,12 +4,19 @@ import (
 	"fmt"
 	bilibili_go "github.com/kainhuck/bilibili-go"
 	"log"
+	"os"
 )
 
 func main() {
+	f, err := os.Create("debug.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
 	client := bilibili_go.NewClient(
 		bilibili_go.WithAuthFilePath("bilibili_cookie.hyk.json"),
-		bilibili_go.WithDebug(false),
+		bilibili_go.WithDebug(true, f),
 	)
 	client.LoginWithQrCode()
 

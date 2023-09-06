@@ -1,6 +1,9 @@
 package bilibili_go
 
-import "net/http"
+import (
+	"net/http"
+	"os"
+)
 
 type options struct {
 	// UserAgent 自定义用户头
@@ -12,8 +15,8 @@ type options struct {
 	// AuthFilePath cookie缓存文件路径, 如果配置了则会缓存cookie，否则不缓存，默认为空
 	AuthFilePath string
 
-	// Debug 是否开启调试模式，如果开启则会将http的请求信息输出到stdout
-	Debug bool
+	// Debug 是否开启调试模式，如果开启则会将http的请求信息输出到output，如果output为nil则视为os.Stdout
+	Debug *debugInfo
 }
 
 type Option interface {
@@ -52,14 +55,23 @@ func WithAuthFilePath(path string) Option {
 	return authFilePath(path)
 }
 
-type debug bool
-
-func (d debug) apply(opt *options) {
-	opt.Debug = bool(d)
+type debug struct {
+	debugInfo *debugInfo
 }
 
-func WithDebug(d bool) Option {
-	return debug(d)
+func (d debug) apply(opt *options) {
+	opt.Debug = d.debugInfo
+}
+
+func WithDebug(d bool, output ...*os.File) Option {
+	info := &debugInfo{
+		debug: d,
+	}
+
+	if len(output) != 0 {
+		info.output = output[0]
+	}
+	return debug{info}
 }
 
 /* ========================================================== */
@@ -68,6 +80,7 @@ var defaultOptions = options{
 	UserAgent:    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
 	HttpClient:   http.DefaultClient,
 	AuthFilePath: "",
+	Debug:        &debugInfo{},
 }
 
 func applyOptions(opts ...Option) *options {

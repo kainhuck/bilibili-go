@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 )
 
@@ -21,16 +22,18 @@ type HttpClient struct {
 	contentType string // 指定Content-Type
 	userAgent   string // 指定User-Agent
 	debug       bool
+	debugOutput *os.File
 }
 
 func NewHttpClient(client *http.Client) *HttpClient {
 	return &HttpClient{
-		httpClient: client,
-		method:     http.MethodGet,
-		params:     make(url.Values),
-		formData:   make(url.Values),
-		header:     make(map[string]string),
-		cookies:    make([]*http.Cookie, 0),
+		httpClient:  client,
+		method:      http.MethodGet,
+		params:      make(url.Values),
+		formData:    make(url.Values),
+		header:      make(map[string]string),
+		cookies:     make([]*http.Cookie, 0),
+		debugOutput: os.Stdout,
 	}
 }
 
@@ -65,6 +68,7 @@ func (c *HttpClient) Clone() *HttpClient {
 		contentType: c.contentType,
 		userAgent:   c.userAgent,
 		debug:       c.debug,
+		debugOutput: c.debugOutput,
 	}
 }
 
@@ -143,8 +147,11 @@ func (c *HttpClient) SetCookies(cookies []*http.Cookie) *HttpClient {
 	return c
 }
 
-func (c *HttpClient) Debug() *HttpClient {
+func (c *HttpClient) Debug(output *os.File) *HttpClient {
 	c.debug = true
+	if output != nil {
+		c.debugOutput = output
+	}
 
 	return c
 }
@@ -181,7 +188,10 @@ func (c *HttpClient) End() (resp *http.Response, body []byte, err error) {
 	}
 
 	if c.debug {
-		fmt.Printf("\n[REQUEST]\n%s\n", HttpDumpRequest(request))
+		_, _ = fmt.Fprintf(c.debugOutput, ">>> REQUEST\n")
+		_, _ = fmt.Fprintf(c.debugOutput, "-------------- start -------------\n")
+		_, _ = fmt.Fprintf(c.debugOutput, "%s\n", HttpDumpRequest(request))
+		_, _ = fmt.Fprintf(c.debugOutput, "--------------  end  -------------\n\n\n")
 	}
 
 	resp, err = c.httpClient.Do(request)
@@ -191,7 +201,10 @@ func (c *HttpClient) End() (resp *http.Response, body []byte, err error) {
 	defer func() { _ = resp.Body.Close() }()
 
 	if c.debug {
-		fmt.Printf("\n[RESPONSE]\n%s\n", HttpDumpResponse(resp))
+		_, _ = fmt.Fprintf(c.debugOutput, ">>> RESPONSE\n")
+		_, _ = fmt.Fprintf(c.debugOutput, "-------------- start -------------\n")
+		_, _ = fmt.Fprintf(c.debugOutput, "%s\n", HttpDumpResponse(resp))
+		_, _ = fmt.Fprintf(c.debugOutput, "--------------  end  -------------\n\n\n")
 	}
 
 	body, err = io.ReadAll(resp.Body)
