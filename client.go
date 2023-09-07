@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/kainhuck/bilibili-go/internal/net"
 	"github.com/kainhuck/bilibili-go/internal/utils"
-	"github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
 	"io"
 	"net/http"
@@ -27,6 +26,7 @@ type Client struct {
 	wbiKey           string
 	wbiKeyLastUpdate time.Time
 	debug            *debugInfo
+	logger           Logger
 }
 
 func NewClient(opts ...Option) *Client {
@@ -42,6 +42,7 @@ func NewClient(opts ...Option) *Client {
 		cookieCache:  make(map[string]string),
 		authFilePath: opt.AuthFilePath,
 		debug:        opt.Debug,
+		logger:       opt.Logger,
 	}
 }
 
@@ -59,13 +60,13 @@ func (c *Client) loadAuthInfoFromFile() bool {
 	if utils.FileExists(c.authFilePath) {
 		auth, err := loadAuthInfoFromFile(c.authFilePath)
 		if err != nil {
-			logrus.Errorf("load auth info from file: %v failed: %v", c.authFilePath, err)
+			c.logger.Errorf("load auth info from file: %v failed: %v", c.authFilePath, err)
 			return false
 		}
 
 		if auth != nil {
 			c.setAuthInfo(auth)
-			logrus.Infof("load auth info from: %v", c.authFilePath)
+			c.logger.Infof("load auth info from: %v", c.authFilePath)
 			return true
 		}
 	}
@@ -109,26 +110,26 @@ func (c *Client) LoginWithQrCode() {
 
 	generateResp, err := c.qrcodeGenerate()
 	if err != nil {
-		logrus.Errorf("generate qrcode failed")
+		c.logger.Errorf("generate qrcode failed")
 		os.Exit(-1)
 	}
 
 	qrCode, err := qrcode.New(generateResp.Url, qrcode.Medium)
 	if err != nil {
-		logrus.Errorf("new qrcode failed")
+		c.logger.Errorf("new qrcode failed")
 		os.Exit(-1)
 	}
 
 	_, err = fmt.Fprint(os.Stdout, qrCode.ToSmallString(true))
 	if err != nil {
-		logrus.Errorf("print qrcode failed")
+		c.logger.Errorf("print qrcode failed")
 		os.Exit(-1)
 	}
 
 	for {
 		resp, cookies, err := c.qrcodePoll(generateResp.QrcodeKey)
 		if err != nil {
-			logrus.Errorf("poll qrcode failed")
+			c.logger.Errorf("poll qrcode failed")
 			os.Exit(-1)
 		}
 
@@ -138,10 +139,10 @@ func (c *Client) LoginWithQrCode() {
 				Cookies:      cookies,
 				RefreshToken: resp.RefreshToken,
 			})
-			logrus.Infof("login success!!!")
+			c.logger.Infof("login success!!!")
 			return
 		case 86038:
-			logrus.Errorf("qrcode expired")
+			c.logger.Errorf("qrcode expired")
 			os.Exit(-1)
 		}
 		time.Sleep(1 * time.Second)
@@ -175,6 +176,7 @@ func (c *Client) UploadVideoFromReader(filename string, reader io.Reader) (*Vide
 
 // UploadVideoFromHTTP 从http链接上传文件
 func (c *Client) UploadVideoFromHTTP(filename string, url string) (*Video, error) {
+	c.logger.Infof("start download file: %v, from: %v", filename, url)
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -210,6 +212,8 @@ func (c *Client) UploadVideo(filename string, content []byte) (*Video, error) {
 	// 分区
 	parts := utils.SplitBytes(content, 10*utils.MB)
 
+	c.logger.Infof("start upload file: %v, parts: %v, size: %.2fMB", filename, len(parts), float64(len(content))/float64(utils.MB))
+
 	errChan := make(chan error, len(parts))
 	wg := sync.WaitGroup{}
 
@@ -221,6 +225,7 @@ func (c *Client) UploadVideo(filename string, content []byte) (*Video, error) {
 	for i, part := range parts {
 		go func(part []byte, number int) {
 			defer wg.Done()
+			defer c.logger.Infof("part: %v finished", number)
 			errChan <- c.uploadFileClip(preResp.Uri(), preResp.Auth, uploadIDResp.UploadID, number, len(parts), len(part), (number-1)*10*utils.MB, (number-1)*10*utils.MB+len(part), filesize, part)
 		}(part, i+1)
 	}
@@ -240,6 +245,8 @@ func (c *Client) UploadVideo(filename string, content []byte) (*Video, error) {
 	if checkResp.OK != 1 {
 		return nil, fmt.Errorf("[uploadCheck] upload failed code: %v", checkResp.OK)
 	}
+
+	c.logger.Infof("video upload finished success，cid: %v", preResp.BizID)
 
 	return &Video{
 		Filename: preResp.Filename(),

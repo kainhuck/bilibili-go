@@ -1,6 +1,7 @@
 package bilibili_go
 
 import (
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 )
@@ -17,6 +18,9 @@ type options struct {
 
 	// Debug 是否开启调试模式，如果开启则会将http的请求信息输出到output，如果output为nil则视为os.Stdout
 	Debug *debugInfo
+
+	// Logger 自定义日志
+	Logger Logger
 }
 
 type Option interface {
@@ -74,6 +78,18 @@ func WithDebug(d bool, output ...*os.File) Option {
 	return debug{info}
 }
 
+type log struct {
+	logger Logger
+}
+
+func (l log) apply(opt *options) {
+	opt.Logger = l.logger
+}
+
+func WithLogger(logger Logger) Option {
+	return log{logger: logger}
+}
+
 /* ========================================================== */
 
 var defaultOptions = options{
@@ -81,6 +97,7 @@ var defaultOptions = options{
 	HttpClient:   http.DefaultClient,
 	AuthFilePath: "",
 	Debug:        &debugInfo{},
+	Logger:       logrus.StandardLogger(),
 }
 
 func applyOptions(opts ...Option) *options {
