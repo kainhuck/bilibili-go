@@ -20,9 +20,9 @@ type debugInfo struct {
 
 type Client struct {
 	httpClient       *net.HttpClient
-	authInfo         *authInfo
+	authInfo         *AuthInfo
+	authStorage      AuthStorage
 	cookieCache      map[string]string
-	authFilePath     string
 	wbiKey           string // imgKey + subKey
 	wbiKeyLastUpdate time.Time
 	debug            *debugInfo
@@ -33,22 +33,19 @@ type Client struct {
 func NewClient(opts ...Option) *Client {
 	opt := applyOptions(opts...)
 
-	auth, _ := loadAuthInfoFromFile(opt.AuthFilePath)
-
 	client := net.NewHttpClient(opt.HttpClient).SetUserAgent(opt.UserAgent)
 
 	return &Client{
 		httpClient:     client,
-		authInfo:       auth,
 		cookieCache:    make(map[string]string),
-		authFilePath:   opt.AuthFilePath,
+		authStorage:    opt.AuthStorage,
 		debug:          opt.Debug,
 		logger:         opt.Logger,
 		showQRCodeFunc: opt.ShowQRCodeFunc,
 	}
 }
 
-func (c *Client) setAuthInfo(auth *authInfo) {
+func (c *Client) setAuthInfo(auth *AuthInfo) {
 	c.authInfo = auth
 	if c.authInfo == nil {
 		return
@@ -56,24 +53,6 @@ func (c *Client) setAuthInfo(auth *authInfo) {
 	for _, cookie := range c.authInfo.Cookies {
 		c.cookieCache[cookie.Name] = cookie.Value
 	}
-}
-
-func (c *Client) loadAuthInfoFromFile() bool {
-	if utils.FileExists(c.authFilePath) {
-		auth, err := loadAuthInfoFromFile(c.authFilePath)
-		if err != nil {
-			c.logger.Errorf("load auth info from file: %v failed: %v", c.authFilePath, err)
-			return false
-		}
-
-		if auth != nil {
-			c.setAuthInfo(auth)
-			c.logger.Infof("load auth info from: %v", c.authFilePath)
-			return true
-		}
-	}
-
-	return false
 }
 
 func (c *Client) getWbiKey() string {
@@ -104,11 +83,25 @@ func (c *Client) getWbiKeyCached() string {
 
 // LoginWithQrCode 登陆这一步必须成功，否则后续接口无法访问
 func (c *Client) LoginWithQrCode() {
-	if c.loadAuthInfoFromFile() {
-		return
+	if c.authStorage != nil {
+		auth, err := c.authStorage.LoadAuthInfo()
+		if err == nil && auth != nil {
+			c.setAuthInfo(auth)
+			c.logger.Info("load auth info from storage")
+			return
+		}
+		if err != nil {
+			c.logger.Errorf("load auth info failed: %v", err)
+		}
 	}
 
-	defer func() { _ = saveAuthInfoToFile(c.authFilePath, c.authInfo) }()
+	defer func() {
+		if c.authStorage != nil {
+			if err := c.authStorage.SaveAuthInfo(c.authInfo); err != nil {
+				c.logger.Errorf("SaveAuthInfo failed: %v", err)
+			}
+		}
+	}()
 
 	generateResp, err := c.qrcodeGenerate()
 	if err != nil {
@@ -136,7 +129,7 @@ func (c *Client) LoginWithQrCode() {
 
 		switch resp.Code {
 		case 0:
-			c.setAuthInfo(&authInfo{
+			c.setAuthInfo(&AuthInfo{
 				Cookies:      cookies,
 				RefreshToken: resp.RefreshToken,
 			})

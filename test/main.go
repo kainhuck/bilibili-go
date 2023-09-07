@@ -8,7 +8,7 @@ import (
 
 func main() {
 	client := bilibili_go.NewClient(
-		bilibili_go.WithAuthFilePath("bilibili_cookie.hyk.json"),
+		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.json")),
 		bilibili_go.WithDebug(false),
 	)
 	client.LoginWithQrCode()
