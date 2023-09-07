@@ -6,6 +6,8 @@ import (
 	"github.com/kainhuck/bilibili-go/internal/utils"
 	"github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
+	"io"
+	"net/http"
 	"os"
 	"strings"
 	"sync"
@@ -146,16 +148,48 @@ func (c *Client) LoginWithQrCode() {
 	}
 }
 
-// UploadVideo 视频上传 videoPath 视频路径
-func (c *Client) UploadVideo(videoPath string) (*Video, error) {
+// UploadVideoFromDisk 从本地磁盘上传视频 videoPath 视频路径
+func (c *Client) UploadVideoFromDisk(videoPath string) (*Video, error) {
 	fileInfo, err := os.Stat(videoPath)
 	if err != nil {
 		return nil, err
 	}
 
+	content, err := os.ReadFile(videoPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.UploadVideo(fileInfo.Name(), content)
+}
+
+// UploadVideoFromReader ...
+func (c *Client) UploadVideoFromReader(filename string, reader io.Reader) (*Video, error) {
+	content, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.UploadVideo(filename, content)
+}
+
+// UploadVideoFromHTTP 从http链接上传文件
+func (c *Client) UploadVideoFromHTTP(filename string, url string) (*Video, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return c.UploadVideoFromReader(filename, resp.Body)
+}
+
+// UploadVideo 视频上传，filename 文件名 content 视频内容
+func (c *Client) UploadVideo(filename string, content []byte) (*Video, error) {
+	filesize := int64(len(content))
 	// 调接口上传
 	// 1. 预上传
-	preResp, err := c.preUpload(fileInfo.Name(), fileInfo.Size())
+	preResp, err := c.preUpload(filename, filesize)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +198,7 @@ func (c *Client) UploadVideo(videoPath string) (*Video, error) {
 	}
 
 	// 2. 获取 upload_id
-	uploadIDResp, err := c.getUploadID(preResp.Uri(), preResp.Auth, preResp.BizID, fileInfo.Size())
+	uploadIDResp, err := c.getUploadID(preResp.Uri(), preResp.Auth, preResp.BizID, filesize)
 	if err != nil {
 		return nil, err
 	}
@@ -173,13 +207,8 @@ func (c *Client) UploadVideo(videoPath string) (*Video, error) {
 	}
 
 	// 3. 分片上传
-	total, err := os.ReadFile(videoPath)
-	if err != nil {
-		return nil, err
-	}
-
 	// 分区
-	parts := utils.SplitBytes(total, 10*utils.MB)
+	parts := utils.SplitBytes(content, 10*utils.MB)
 
 	errChan := make(chan error, len(parts))
 	wg := sync.WaitGroup{}
@@ -192,7 +221,7 @@ func (c *Client) UploadVideo(videoPath string) (*Video, error) {
 	for i, part := range parts {
 		go func(part []byte, number int) {
 			defer wg.Done()
-			errChan <- c.uploadFileClip(preResp.Uri(), preResp.Auth, uploadIDResp.UploadID, number, len(parts), len(part), (number-1)*10*utils.MB, (number-1)*10*utils.MB+len(part), fileInfo.Size(), part)
+			errChan <- c.uploadFileClip(preResp.Uri(), preResp.Auth, uploadIDResp.UploadID, number, len(parts), len(part), (number-1)*10*utils.MB, (number-1)*10*utils.MB+len(part), filesize, part)
 		}(part, i+1)
 	}
 
@@ -203,7 +232,7 @@ func (c *Client) UploadVideo(videoPath string) (*Video, error) {
 	}
 
 	// 视频上传完成
-	checkResp, err := c.uploadCheck(preResp.Uri(), preResp.Auth, fileInfo.Name(), uploadIDResp.UploadID, preResp.BizID)
+	checkResp, err := c.uploadCheck(preResp.Uri(), preResp.Auth, filename, uploadIDResp.UploadID, preResp.BizID)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +243,7 @@ func (c *Client) UploadVideo(videoPath string) (*Video, error) {
 
 	return &Video{
 		Filename: preResp.Filename(),
-		Title:    strings.Split(fileInfo.Name(), ".")[0],
+		Title:    strings.Split(filename, ".")[0],
 		Desc:     "",
 		CID:      preResp.BizID,
 	}, nil

@@ -4,19 +4,12 @@ import (
 	"fmt"
 	bilibili_go "github.com/kainhuck/bilibili-go"
 	"log"
-	"os"
 )
 
 func main() {
-	f, err := os.Create("debug.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
 	client := bilibili_go.NewClient(
 		bilibili_go.WithAuthFilePath("bilibili_cookie.hyk.json"),
-		bilibili_go.WithDebug(true, f),
+		bilibili_go.WithDebug(false),
 	)
 	client.LoginWithQrCode()
 
@@ -28,7 +21,7 @@ func main() {
 // SubmitVideo 视频投稿
 func SubmitVideo(client *bilibili_go.Client) {
 	// 1. 上传视频
-	video, err := client.UploadVideo("/Users/edy/Downloads/一起去郊游吧.mp4")
+	video, err := client.UploadVideoFromDisk("/Users/edy/Downloads/一起去郊游吧.mp4")
 	if err != nil {
 		log.Fatal(err)
 	}
