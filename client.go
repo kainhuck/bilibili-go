@@ -23,7 +23,7 @@ type Client struct {
 	authInfo         *authInfo
 	cookieCache      map[string]string
 	authFilePath     string
-	wbiKey           string
+	wbiKey           string // imgKey + subKey
 	wbiKeyLastUpdate time.Time
 	debug            *debugInfo
 	logger           Logger
@@ -84,7 +84,7 @@ func (c *Client) getWbiKey() string {
 
 	imgKey := strings.Split(strings.Split(resp.WBIImg.ImgURL, "/")[len(strings.Split(resp.WBIImg.ImgURL, "/"))-1], ".")[0]
 	subKey := strings.Split(strings.Split(resp.WBIImg.SubURL, "/")[len(strings.Split(resp.WBIImg.SubURL, "/"))-1], ".")[0]
-	return getMixinKey(imgKey + subKey)
+	return imgKey + subKey
 }
 
 func (c *Client) updateWbiKeyCache() {

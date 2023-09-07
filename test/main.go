@@ -62,7 +62,7 @@ func SearchUserInfo(client *bilibili_go.Client) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("用户名：%v，粉丝数：%v\n", card.Card.Name, card.Card.Fans)
+	fmt.Printf("用户名：%v，粉丝数：%v，头衔：%v\n", card.Card.Name, card.Card.Fans, card.Card.Official.Title)
 
 	// 2. 查询自身信息
 	resp, err := client.GetMyInfo()
