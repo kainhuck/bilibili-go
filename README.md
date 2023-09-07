@@ -1,6 +1,10 @@
 ![bilibili-go](https://socialify.git.ci/kainhuck/bilibili-go/image?description=1&descriptionEditable=%E7%AE%80%E5%8D%95%E5%A5%BD%E7%94%A8%E7%9A%84%20bilibili%20golang%20sdk&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pattern=Floating%20Cogs&pulls=1&stargazers=1&theme=Auto)
 
-![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/kainhuck/bilibili-go) ![GitHub](https://img.shields.io/github/license/kainhuck/bilibili-go) ![GitHub tag (with filter)](https://img.shields.io/github/v/tag/kainhuck/bilibili-go)
+## 简介 📜
+
+![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/kainhuck/bilibili-go) 
+![GitHub](https://img.shields.io/github/license/kainhuck/bilibili-go) 
+![GitHub tag (with filter)](https://img.shields.io/github/v/tag/kainhuck/bilibili-go)
 
 使用`bilibili-go`来顺畅的接入bilibili，支持视频投稿，个人信息查询...
 
