@@ -1,7 +1,9 @@
 package bilibili_go
 
 import (
+	"fmt"
 	"github.com/sirupsen/logrus"
+	"github.com/skip2/go-qrcode"
 	"net/http"
 	"os"
 )
@@ -21,6 +23,10 @@ type options struct {
 
 	// Logger 自定义日志
 	Logger Logger
+
+	// ShowQRCodeFunc 自定义输出二维码的方法，默认在stdout输出，
+	// 可以通过自定义该方法可以实现其他输出，比如将图片发送到消息通知群
+	ShowQRCodeFunc func(code *qrcode.QRCode) error
 }
 
 type Option interface {
@@ -90,6 +96,16 @@ func WithLogger(logger Logger) Option {
 	return log{logger: logger}
 }
 
+type showQRCodeFunc func(code *qrcode.QRCode) error
+
+func (s showQRCodeFunc) apply(opt *options) {
+	opt.ShowQRCodeFunc = s
+}
+
+func WithShowQRCodeFunc(f func(code *qrcode.QRCode) error) Option {
+	return showQRCodeFunc(f)
+}
+
 /* ========================================================== */
 
 var defaultOptions = options{
@@ -98,6 +114,11 @@ var defaultOptions = options{
 	AuthFilePath: "",
 	Debug:        &debugInfo{},
 	Logger:       logrus.StandardLogger(),
+	ShowQRCodeFunc: func(code *qrcode.QRCode) error {
+		_, err := fmt.Fprint(os.Stdout, code.ToSmallString(true))
+
+		return err
+	},
 }
 
 func applyOptions(opts ...Option) *options {

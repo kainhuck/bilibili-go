@@ -27,6 +27,7 @@ type Client struct {
 	wbiKeyLastUpdate time.Time
 	debug            *debugInfo
 	logger           Logger
+	showQRCodeFunc   func(code *qrcode.QRCode) error
 }
 
 func NewClient(opts ...Option) *Client {
@@ -37,12 +38,13 @@ func NewClient(opts ...Option) *Client {
 	client := net.NewHttpClient(opt.HttpClient).SetUserAgent(opt.UserAgent)
 
 	return &Client{
-		httpClient:   client,
-		authInfo:     auth,
-		cookieCache:  make(map[string]string),
-		authFilePath: opt.AuthFilePath,
-		debug:        opt.Debug,
-		logger:       opt.Logger,
+		httpClient:     client,
+		authInfo:       auth,
+		cookieCache:    make(map[string]string),
+		authFilePath:   opt.AuthFilePath,
+		debug:          opt.Debug,
+		logger:         opt.Logger,
+		showQRCodeFunc: opt.ShowQRCodeFunc,
 	}
 }
 
@@ -120,9 +122,8 @@ func (c *Client) LoginWithQrCode() {
 		os.Exit(-1)
 	}
 
-	_, err = fmt.Fprint(os.Stdout, qrCode.ToSmallString(true))
-	if err != nil {
-		c.logger.Errorf("print qrcode failed")
+	if err := c.showQRCodeFunc(qrCode); err != nil {
+		c.logger.Errorf("show qrcode failed")
 		os.Exit(-1)
 	}
 
