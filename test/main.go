@@ -39,7 +39,7 @@ func SubmitVideo(client *bilibili_go.Client) {
 		Cover:     cover.Url,
 		Title:     "一起去郊游吧",
 		Copyright: 1,
-		TID:       bilibili_go.LifeGroup.MainTID(),
+		TID:       bilibili_go.LifeGroup.MainTid(),
 		Tag:       "郊游",
 		Desc:      "我们一起去郊游吧",
 		Recreate:  -1,
