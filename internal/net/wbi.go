@@ -1,4 +1,4 @@
-package bilibili_go
+package net
 
 import (
 	"crypto/md5"

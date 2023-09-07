@@ -23,6 +23,7 @@ type HttpClient struct {
 	userAgent   string // 指定User-Agent
 	debug       bool
 	debugOutput *os.File
+	wbiKey      string
 }
 
 func NewHttpClient(client *http.Client) *HttpClient {
@@ -69,6 +70,7 @@ func (c *HttpClient) Clone() *HttpClient {
 		userAgent:   c.userAgent,
 		debug:       c.debug,
 		debugOutput: c.debugOutput,
+		wbiKey:      c.wbiKey,
 	}
 }
 
@@ -123,12 +125,6 @@ func (c *HttpClient) SetParams(key string, value string) *HttpClient {
 	return c
 }
 
-func (c *HttpClient) CoverParams(params url.Values) *HttpClient {
-	c.params = params
-
-	return c
-}
-
 func (c *HttpClient) SetHeader(key string, value string) *HttpClient {
 	c.header[key] = value
 
@@ -143,6 +139,12 @@ func (c *HttpClient) SendBody(body io.Reader) *HttpClient {
 
 func (c *HttpClient) SetCookies(cookies []*http.Cookie) *HttpClient {
 	c.cookies = cookies
+
+	return c
+}
+
+func (c *HttpClient) SetWbiKey(wbiKey string) *HttpClient {
+	c.wbiKey = getMixinKey(wbiKey)
 
 	return c
 }
@@ -165,6 +167,10 @@ func (c *HttpClient) End() (resp *http.Response, body []byte, err error) {
 	request, err := http.NewRequest(c.method, c.uri, c.body)
 	if err != nil {
 		return nil, nil, err
+	}
+
+	if c.wbiKey != "" {
+		encWbi(c.params, c.wbiKey)
 	}
 
 	if len(c.params) > 0 {

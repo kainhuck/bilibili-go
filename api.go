@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"os"
 	"strconv"
 	"time"
@@ -281,12 +280,11 @@ func (c *Client) GetCoin() (*GetCoinResponse, error) {
 func (c *Client) GetUserInfo(mid string) (*GetUserInfoResponse, error) {
 	uri := "https://api.bilibili.com/x/space/wbi/acc/info"
 
-	params := make(url.Values)
-	params.Add("mid", mid)
-	encWbi(params, c.getWbiKeyCached())
-
 	var baseResp BaseResponse
-	err := c.getHttpClient(true).Get(uri).CoverParams(params).EndStruct(&baseResp)
+	err := c.getHttpClient(true).Get(uri).
+		SetWbiKey(c.getWbiKeyCached()).
+		AddParams("mid", mid).
+		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
 	}
