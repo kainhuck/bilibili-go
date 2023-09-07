@@ -1,4 +1,4 @@
-# bilibili-go
+![bilibili-go](https://socialify.git.ci/kainhuck/bilibili-go/image?description=1&descriptionEditable=%E7%AE%80%E5%8D%95%E5%A5%BD%E7%94%A8%E7%9A%84%20bilibili%20golang%20sdk&font=Inter&forks=1&issues=1&language=1&name=1&owner=1&pattern=Floating%20Cogs&pulls=1&stargazers=1&theme=Auto)
 
 ![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/kainhuck/bilibili-go) ![GitHub](https://img.shields.io/github/license/kainhuck/bilibili-go) ![GitHub tag (with filter)](https://img.shields.io/github/v/tag/kainhuck/bilibili-go)
 
@@ -28,6 +28,9 @@
 [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
 
 ## 更新日志 🐥
+
+### v0.2.3
+1. 添加视频分区
 
 ### v0.2.2
 1. 更新debug调试，可输出到指定文件
