@@ -8,7 +8,7 @@ import (
 
 func main() {
 	client := bilibili_go.NewClient(
-		bilibili_go.WithAuthFilePath("bilibili_cookie.hyk.json"),
+		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.json")),
 		bilibili_go.WithDebug(false),
 	)
 	client.LoginWithQrCode()
@@ -58,7 +58,7 @@ func SubmitVideo(client *bilibili_go.Client) {
 // SearchUserInfo 查询用户信息
 func SearchUserInfo(client *bilibili_go.Client) {
 	// 1. 根据mid查询其他用户信息
-	card, err := client.GetUserCard("2", true)
+	card, err := client.GetUserCard("13868000", true)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -15,8 +15,8 @@ type options struct {
 	// HttpClient 自定义http客户端
 	HttpClient *http.Client
 
-	// AuthFilePath cookie缓存文件路径, 如果配置了则会缓存cookie，否则不缓存，默认为空
-	AuthFilePath string
+	// AuthStorage 认证信息存储
+	AuthStorage AuthStorage
 
 	// Debug 是否开启调试模式，如果开启则会将http的请求信息输出到output，如果output为nil则视为os.Stdout
 	Debug *debugInfo
@@ -55,14 +55,16 @@ func WithHttpClient(client *http.Client) Option {
 	return httpClient{client: client}
 }
 
-type authFilePath string
-
-func (path authFilePath) apply(opt *options) {
-	opt.AuthFilePath = string(path)
+type authStorage struct {
+	storage AuthStorage
 }
 
-func WithAuthFilePath(path string) Option {
-	return authFilePath(path)
+func (a authStorage) apply(opt *options) {
+	opt.AuthStorage = a.storage
+}
+
+func WithAuthStorage(storage AuthStorage) Option {
+	return authStorage{storage: storage}
 }
 
 type debug struct {
@@ -109,11 +111,10 @@ func WithShowQRCodeFunc(f func(code *qrcode.QRCode) error) Option {
 /* ========================================================== */
 
 var defaultOptions = options{
-	UserAgent:    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
-	HttpClient:   http.DefaultClient,
-	AuthFilePath: "",
-	Debug:        &debugInfo{},
-	Logger:       logrus.StandardLogger(),
+	UserAgent:  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
+	HttpClient: http.DefaultClient,
+	Debug:      &debugInfo{},
+	Logger:     logrus.StandardLogger(),
 	ShowQRCodeFunc: func(code *qrcode.QRCode) error {
 		_, err := fmt.Fprint(os.Stdout, code.ToSmallString(true))
 

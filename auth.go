@@ -6,18 +6,30 @@ import (
 	"os"
 )
 
-type authInfo struct {
+type AuthInfo struct {
 	Cookies      []*http.Cookie `json:"cookies"`
 	RefreshToken string         `json:"refresh_token"`
 }
 
-func loadAuthInfoFromFile(filepath string) (*authInfo, error) {
-	bts, err := os.ReadFile(filepath)
+type AuthStorage interface {
+	// LoadAuthInfo 加载AuthInfo
+	LoadAuthInfo() (*AuthInfo, error)
+
+	// SaveAuthInfo 保存AuthInfo
+	SaveAuthInfo(*AuthInfo) error
+}
+
+type fileAuthStorage struct {
+	file string
+}
+
+func (f fileAuthStorage) LoadAuthInfo() (*AuthInfo, error) {
+	bts, err := os.ReadFile(f.file)
 	if err != nil {
 		return nil, err
 	}
 
-	var auth authInfo
+	var auth AuthInfo
 	if err = json.Unmarshal(bts, &auth); err != nil {
 		return nil, err
 	}
@@ -25,13 +37,13 @@ func loadAuthInfoFromFile(filepath string) (*authInfo, error) {
 	return &auth, nil
 }
 
-func saveAuthInfoToFile(filepath string, auth *authInfo) error {
-	bts, err := json.Marshal(auth)
+func (f fileAuthStorage) SaveAuthInfo(info *AuthInfo) error {
+	bts, err := json.Marshal(info)
 	if err != nil {
 		return err
 	}
 
-	file, err := os.Create(filepath)
+	file, err := os.Create(f.file)
 	if err != nil {
 		return err
 	}
@@ -39,4 +51,8 @@ func saveAuthInfoToFile(filepath string, auth *authInfo) error {
 	_, err = file.Write(bts)
 
 	return err
+}
+
+func NewFileAuthStorage(file string) AuthStorage {
+	return &fileAuthStorage{file: file}
 }
