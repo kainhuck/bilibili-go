@@ -13,7 +13,7 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	resp, err := client.GetRelationStat("2")
+	resp, err := client.GetUpStat("2")
 	if err != nil {
 		log.Fatal(err)
 	}

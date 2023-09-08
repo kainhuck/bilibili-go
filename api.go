@@ -362,3 +362,24 @@ func (c *Client) GetRelationStat(mid string) (*GetRelationStatResponse, error) {
 
 	return rsp, err
 }
+
+// GetUpStat 获取up主状态数 https://api.bilibili.com/x/space/upstat
+func (c *Client) GetUpStat(mid string) (*GetUpStatResponse, error) {
+	uri := "https://api.bilibili.com/x/space/upstat"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("mid", mid).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &GetUpStatResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}

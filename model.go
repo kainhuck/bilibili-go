@@ -579,3 +579,16 @@ type GetRelationStatResponse struct {
 	Black     int `json:"black"`     // 黑名单数 需要登陆
 	Follower  int `json:"follower"`  // 粉丝数
 }
+
+// GetUpStatResponse up主状态
+type GetUpStatResponse struct {
+	Archive struct {
+		EnableVT int `json:"enable_vt"`
+		View     int `json:"view"` // 视频播放量
+		VT       int `json:"vt"`
+	} `json:"archive"`
+	Article struct {
+		View int `json:"view"` // 专栏阅读量
+	} `json:"article"`
+	Likes int `json:"likes"` // 点赞量
+}
