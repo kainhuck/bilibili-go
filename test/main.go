@@ -13,7 +13,7 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	resp, err := client.GetUpStat("2")
+	resp, err := client.GetDocUploadCount("13868000")
 	if err != nil {
 		log.Fatal(err)
 	}

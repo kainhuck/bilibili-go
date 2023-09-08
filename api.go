@@ -383,3 +383,24 @@ func (c *Client) GetUpStat(mid string) (*GetUpStatResponse, error) {
 
 	return rsp, err
 }
+
+// GetDocUploadCount 相簿投稿数 https://api.vc.bilibili.com/link_draw/v1/doc/upload_count
+func (c *Client) GetDocUploadCount(mid string) (*GetDocUploadCountResponse, error) {
+	uri := "https://api.vc.bilibili.com/link_draw/v1/doc/upload_count"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(false).Get(uri).
+		AddParams("uid", mid).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &GetDocUploadCountResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}

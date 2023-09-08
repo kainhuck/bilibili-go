@@ -592,3 +592,11 @@ type GetUpStatResponse struct {
 	} `json:"article"`
 	Likes int `json:"likes"` // 点赞量
 }
+
+// GetDocUploadCountResponse 相簿投稿数
+type GetDocUploadCountResponse struct {
+	AllCount   int `json:"all_count"`   // 相簿总数 以下3个之和
+	DrawCount  int `json:"draw_count"`  // 发布绘画数
+	PhotoCount int `json:"photo_count"` // 发布摄影数
+	DailyCount int `json:"daily_count"` // 发布日常（图片动态）数
+}
