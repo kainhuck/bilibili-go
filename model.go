@@ -570,3 +570,33 @@ type GetMyInfoResponse struct {
 	Following int     `json:"following"` // 粉丝数
 	Follower  int     `json:"follower"`  // 粉丝数
 }
+
+// GetRelationStatResponse 用户关系状态
+type GetRelationStatResponse struct {
+	Mid       int `json:"mid"`
+	Following int `json:"following"` // 关注数
+	Whisper   int `json:"whisper"`   // 悄悄关注数 需要登陆
+	Black     int `json:"black"`     // 黑名单数 需要登陆
+	Follower  int `json:"follower"`  // 粉丝数
+}
+
+// GetUpStatResponse up主状态
+type GetUpStatResponse struct {
+	Archive struct {
+		EnableVT int `json:"enable_vt"`
+		View     int `json:"view"` // 视频播放量
+		VT       int `json:"vt"`
+	} `json:"archive"`
+	Article struct {
+		View int `json:"view"` // 专栏阅读量
+	} `json:"article"`
+	Likes int `json:"likes"` // 点赞量
+}
+
+// GetDocUploadCountResponse 相簿投稿数
+type GetDocUploadCountResponse struct {
+	AllCount   int `json:"all_count"`   // 相簿总数 以下3个之和
+	DrawCount  int `json:"draw_count"`  // 发布绘画数
+	PhotoCount int `json:"photo_count"` // 发布摄影数
+	DailyCount int `json:"daily_count"` // 发布日常（图片动态）数
+}

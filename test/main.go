@@ -13,7 +13,13 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	SearchUserInfo(client)
+	resp, err := client.GetDocUploadCount("13868000")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(resp)
+
+	//SearchUserInfo(client)
 
 	//SubmitVideo(client)
 }

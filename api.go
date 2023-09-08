@@ -341,3 +341,66 @@ func (c *Client) GetMyInfo() (*GetMyInfoResponse, error) {
 
 	return rsp, err
 }
+
+// GetRelationStat 获取用户关系状态 https://api.bilibili.com/x/relation/stat
+func (c *Client) GetRelationStat(mid string) (*GetRelationStatResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/stat"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("vmid", mid).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &GetRelationStatResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetUpStat 获取up主状态数 https://api.bilibili.com/x/space/upstat
+func (c *Client) GetUpStat(mid string) (*GetUpStatResponse, error) {
+	uri := "https://api.bilibili.com/x/space/upstat"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("mid", mid).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &GetUpStatResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetDocUploadCount 相簿投稿数 https://api.vc.bilibili.com/link_draw/v1/doc/upload_count
+func (c *Client) GetDocUploadCount(mid string) (*GetDocUploadCountResponse, error) {
+	uri := "https://api.vc.bilibili.com/link_draw/v1/doc/upload_count"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(false).Get(uri).
+		AddParams("uid", mid).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &GetDocUploadCountResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
