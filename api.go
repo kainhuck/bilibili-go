@@ -341,3 +341,24 @@ func (c *Client) GetMyInfo() (*GetMyInfoResponse, error) {
 
 	return rsp, err
 }
+
+// GetRelationStat 获取用户关系状态 https://api.bilibili.com/x/relation/stat
+func (c *Client) GetRelationStat(mid string) (*GetRelationStatResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/stat"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("vmid", mid).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &GetRelationStatResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}

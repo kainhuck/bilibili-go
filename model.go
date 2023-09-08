@@ -570,3 +570,12 @@ type GetMyInfoResponse struct {
 	Following int     `json:"following"` // 粉丝数
 	Follower  int     `json:"follower"`  // 粉丝数
 }
+
+// GetRelationStatResponse 用户关系状态
+type GetRelationStatResponse struct {
+	Mid       int `json:"mid"`
+	Following int `json:"following"` // 关注数
+	Whisper   int `json:"whisper"`   // 悄悄关注数 需要登陆
+	Black     int `json:"black"`     // 黑名单数 需要登陆
+	Follower  int `json:"follower"`  // 粉丝数
+}
