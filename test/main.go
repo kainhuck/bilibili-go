@@ -34,7 +34,7 @@ func SubmitVideo(client *bilibili_go.Client) {
 	log.Println("视频上传成功")
 
 	// 2. 上传封面
-	cover, err := client.UploadCover("/Users/edy/Downloads/cover.jpeg")
+	cover, err := client.UploadCoverFromDisk("/Users/edy/Downloads/cover.jpeg")
 	if err != nil {
 		log.Fatal(err)
 	}

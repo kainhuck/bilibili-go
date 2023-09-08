@@ -250,6 +250,38 @@ func (c *Client) UploadVideo(filename string, content []byte) (*Video, error) {
 	}, nil
 }
 
+// UploadCoverFromDisk 从本地磁盘上传封面 imagePath 图片路径
+func (c *Client) UploadCoverFromDisk(imagePath string) (*UploadCoverResponse, error) {
+	imageData, err := os.ReadFile(imagePath)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.UploadCover(imageData)
+}
+
+// UploadCoverFromReader ...
+func (c *Client) UploadCoverFromReader(reader io.Reader) (*UploadCoverResponse, error) {
+	imageData, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.UploadCover(imageData)
+}
+
+// UploadCoverFromHTTP 从http链接上传封面
+func (c *Client) UploadCoverFromHTTP(url string) (*UploadCoverResponse, error) {
+	c.logger.Infof("start download cover from: %v", url)
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return c.UploadCoverFromReader(resp.Body)
+}
+
 /* ===================== helper ===================== */
 
 func (c *Client) getHttpClient(auth bool) *net.HttpClient {
