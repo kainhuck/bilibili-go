@@ -604,7 +604,7 @@ type GetDocUploadCountResponse struct {
 // RelationUserResponse 用户关系响应
 type RelationUserResponse struct {
 	List      []RelationUser `json:"list"` // 列表
-	ReVersion int            `json:"re_version"`
+	ReVersion interface{}    `json:"re_version"`
 	Total     int            `json:"total"` // 总数
 }
 

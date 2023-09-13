@@ -510,3 +510,101 @@ func (c *Client) SearchUserFollowings(mid string, name string, ps int, pn int) (
 
 	return rsp, err
 }
+
+// GetSameFollowings 查询共同关注列表 https://api.bilibili.com/x/relation/same/followings
+// mid 目标用户ID
+// ps 每页大小
+// pn 页码
+func (c *Client) GetSameFollowings(mid string, ps int, pn int) (*RelationUserResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/same/followings"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("vmid", mid).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("pn", strconv.Itoa(pn)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &RelationUserResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetWhispers 查询悄悄关注列表 https://api.bilibili.com/x/relation/whispers
+// mid 目标用户ID
+// ps 每页大小
+// pn 页码
+// 只能查看自己的悄悄关注，total字段不返回，list 返回全部
+func (c *Client) GetWhispers() (*RelationUserResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/whispers"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &RelationUserResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetFriends 查询互相关注列表 https://api.bilibili.com/x/relation/friends
+// mid 目标用户ID
+// ps 每页大小
+// pn 页码
+// 只能查看自己的互相关注，total字段不返回，list 返回全部
+func (c *Client) GetFriends() (*RelationUserResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/friends"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &RelationUserResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetBlacks 查询黑名单列表 https://api.bilibili.com/x/relation/blacks
+// ps 每页大小
+// pn 页码
+func (c *Client) GetBlacks(ps int, pn int) (*RelationUserResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/blacks"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("pn", strconv.Itoa(pn)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &RelationUserResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
