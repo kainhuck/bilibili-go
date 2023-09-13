@@ -601,18 +601,18 @@ type GetDocUploadCountResponse struct {
 	DailyCount int `json:"daily_count"` // 发布日常（图片动态）数
 }
 
-// GetUserFollowersResponse 用户粉丝
-type GetUserFollowersResponse struct {
-	List      []RelationUser `json:"list"` // 粉丝列表
+// RelationUserResponse 用户关系响应
+type RelationUserResponse struct {
+	List      []RelationUser `json:"list"` // 列表
 	ReVersion int            `json:"re_version"`
-	Total     int            `json:"total"` // 粉丝总数
+	Total     int            `json:"total"` // 总数
 }
 
 type RelationUser struct {
 	Mid            int      `json:"mid"`
 	Attribute      int      `json:"attribute"`     // 0 未关注 1 已关注 2 已关注 6 已互粉 128 已拉黑
 	Mtime          int      `json:"mtime"`         // 关注对方时间
-	Tag            []string `json:"tag"`           // 分组ID
+	Tag            []int    `json:"tag"`           // 分组ID
 	Special        int      `json:"special"`       // 特别关注标志 0 否 1 是
 	ContractInfo   struct{} `json:"contract_info"` // unknown
 	Uname          string   `json:"uname"`
@@ -620,8 +620,10 @@ type RelationUser struct {
 	Sign           string   `json:"sign"`
 	FaceNft        int      `json:"face_nft"`
 	OfficialVerify struct {
-		Type int    `json:"type"`
-		Desc string `json:"desc"`
+		Type  int    `json:"type"` // 1 已认证 -1 无认证
+		Desc  string `json:"desc"`
+		Role  int    `json:"role"`
+		Title string `json:"title"`
 	} `json:"official_verify"`
 	Vip struct {
 		VipType       int    `json:"vipType"`
@@ -647,11 +649,4 @@ type RelationUser struct {
 	NftIcon   string `json:"nft_icon"`
 	RecReason string `json:"rec_reason"`
 	TrackId   string `json:"track_id"`
-}
-
-// GetUserFollowingsResponse 用户关注
-type GetUserFollowingsResponse struct {
-	List      []RelationUser `json:"list"` // 关注列表
-	ReVersion int            `json:"re_version"`
-	Total     int            `json:"total"` // 关注总数
 }

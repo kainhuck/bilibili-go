@@ -13,7 +13,7 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	resp, err := client.GetUserFollowingsV2("2", 50, 1)
+	resp, err := client.SearchUserFollowings("2", "", 50, 1)
 	if err != nil {
 		log.Fatal(err)
 	}

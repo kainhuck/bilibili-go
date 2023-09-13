@@ -405,7 +405,7 @@ func (c *Client) GetDocUploadCount(mid string) (*GetDocUploadCountResponse, erro
 // ps 每页大小
 // pn 页码
 // 注意：查询别的用户粉丝数上限为250
-func (c *Client) GetUserFollowers(mid string, ps int, pn int) (*GetUserFollowersResponse, error) {
+func (c *Client) GetUserFollowers(mid string, ps int, pn int) (*RelationUserResponse, error) {
 	uri := "https://api.bilibili.com/x/relation/followers"
 
 	var baseResp BaseResponse
@@ -421,7 +421,7 @@ func (c *Client) GetUserFollowers(mid string, ps int, pn int) (*GetUserFollowers
 		return nil, fmt.Errorf(baseResp.Message)
 	}
 
-	rsp := &GetUserFollowersResponse{}
+	rsp := &RelationUserResponse{}
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
 	return rsp, err
@@ -433,7 +433,7 @@ func (c *Client) GetUserFollowers(mid string, ps int, pn int) (*GetUserFollowers
 // ps 每页大小
 // pn 页码
 // 注意：查询别的用户关注数上限为250
-func (c *Client) GetUserFollowings(mid string, orderType string, ps int, pn int) (*GetUserFollowingsResponse, error) {
+func (c *Client) GetUserFollowings(mid string, orderType string, ps int, pn int) (*RelationUserResponse, error) {
 	uri := "https://api.bilibili.com/x/relation/followings"
 
 	var baseResp BaseResponse
@@ -450,7 +450,7 @@ func (c *Client) GetUserFollowings(mid string, orderType string, ps int, pn int)
 		return nil, fmt.Errorf(baseResp.Message)
 	}
 
-	rsp := &GetUserFollowingsResponse{}
+	rsp := &RelationUserResponse{}
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
 	return rsp, err
@@ -461,7 +461,7 @@ func (c *Client) GetUserFollowings(mid string, orderType string, ps int, pn int)
 // ps 每页大小
 // pn 页码
 // 注意：仅可查看前 5 页 可以获取已设置可见性隐私的关注列表
-func (c *Client) GetUserFollowingsV2(mid string, ps int, pn int) (*GetUserFollowingsResponse, error) {
+func (c *Client) GetUserFollowingsV2(mid string, ps int, pn int) (*RelationUserResponse, error) {
 	uri := "https://app.biliapi.net/x/v2/relation/followings"
 
 	var baseResp BaseResponse
@@ -477,7 +477,35 @@ func (c *Client) GetUserFollowingsV2(mid string, ps int, pn int) (*GetUserFollow
 		return nil, fmt.Errorf(baseResp.Message)
 	}
 
-	rsp := &GetUserFollowingsResponse{}
+	rsp := &RelationUserResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// SearchUserFollowings 搜索用户关注列表 https://api.bilibili.com/x/relation/followings/search
+// mid 目标用户ID
+// name 搜索关键词
+// ps 每页大小
+// pn 页码
+func (c *Client) SearchUserFollowings(mid string, name string, ps int, pn int) (*RelationUserResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/followings/search"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("vmid", mid).
+		AddParams("name", name).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("pn", strconv.Itoa(pn)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &RelationUserResponse{}
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
 	return rsp, err
