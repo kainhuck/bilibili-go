@@ -650,3 +650,8 @@ type RelationUser struct {
 	RecReason string `json:"rec_reason"`
 	TrackId   string `json:"track_id"`
 }
+
+// BatchModifyRelationResponse 批量操作关系
+type BatchModifyRelationResponse struct {
+	FailedFids []string `json:"failed_fids"` // 操作失败的 mid 列表
+}
