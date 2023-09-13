@@ -13,11 +13,11 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	resp, err := client.GetBlacks(1, 1)
+	err := client.ModifyRelation("2", 1, 11)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(resp.Total, len(resp.List))
+	fmt.Println("success")
 
 	//SearchUserInfo(client)
 

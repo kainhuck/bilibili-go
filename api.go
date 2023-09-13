@@ -608,3 +608,42 @@ func (c *Client) GetBlacks(ps int, pn int) (*RelationUserResponse, error) {
 
 	return rsp, err
 }
+
+// ModifyRelation 操作用户关系 https://api.bilibili.com/x/relation/modify
+// mid 目标用户mid
+// act 操作代码
+//
+//	1 关注
+//	2 取关
+//	3 悄悄关注
+//	4 取消悄悄关注
+//	5 拉黑
+//	6 取消拉黑
+//	7 踢出粉丝
+//
+// reSrc 关注来源
+//
+//	11 空间
+//	14 视频
+//	115 文章
+//	222 活动页面
+func (c *Client) ModifyRelation(mid string, act int, reSrc int) error {
+	uri := "https://api.bilibili.com/x/relation/modify"
+
+	var baseResp BaseResponse
+
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("fid", mid).
+		AddFormData("act", strconv.Itoa(act)).
+		AddFormData("re_src", strconv.Itoa(reSrc)).
+		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return err
+	}
+	if baseResp.Code != 0 {
+		return fmt.Errorf(baseResp.Message)
+	}
+
+	return nil
+}
