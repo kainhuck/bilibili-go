@@ -318,8 +318,8 @@ func (c *Client) GetUserCard(mid string, photo bool) (*GetUserCardResponse, erro
 	return rsp, err
 }
 
-// GetMyInfo 登陆用户空间详细信息 https://api.bilibili.com/x/space/myinfo
-func (c *Client) GetMyInfo() (*GetMyInfoResponse, error) {
+// getMyInfo 登陆用户空间详细信息 https://api.bilibili.com/x/space/myinfo
+func (c *Client) getMyInfo() (*GetMyInfoResponse, error) {
 	uri := "https://api.bilibili.com/x/space/myinfo"
 
 	var baseResp BaseResponse

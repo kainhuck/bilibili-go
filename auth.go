@@ -7,8 +7,9 @@ import (
 )
 
 type AuthInfo struct {
-	Cookies      []*http.Cookie `json:"cookies"`
-	RefreshToken string         `json:"refresh_token"`
+	Cookies      []*http.Cookie     `json:"cookies"`
+	RefreshToken string             `json:"refresh_token"`
+	User         *GetMyInfoResponse `json:"username"`
 }
 
 type AuthStorage interface {

@@ -87,8 +87,19 @@ func (c *Client) LoginWithQrCode() {
 		auth, err := c.authStorage.LoadAuthInfo()
 		if err == nil && auth != nil {
 			c.setAuthInfo(auth)
-			c.logger.Info("load auth info from storage")
-			return
+			user, err := c.getMyInfo()
+			if err == nil {
+				c.authInfo.User = user
+				if err := c.authStorage.SaveAuthInfo(c.authInfo); err != nil {
+					c.logger.Errorf("SaveAuthInfo failed: %v", err)
+					os.Exit(-1)
+				}
+				c.logger.Info("load auth info from storage")
+				return
+			} else {
+				// maybe token过期
+				c.logger.Warnf("auth info error: %v", err)
+			}
 		}
 		if err != nil {
 			c.logger.Errorf("load auth info failed: %v", err)
@@ -105,25 +116,25 @@ func (c *Client) LoginWithQrCode() {
 
 	generateResp, err := c.qrcodeGenerate()
 	if err != nil {
-		c.logger.Errorf("generate qrcode failed")
+		c.logger.Errorf("generate qrcode failed: %v", err)
 		os.Exit(-1)
 	}
 
 	qrCode, err := qrcode.New(generateResp.Url, qrcode.Medium)
 	if err != nil {
-		c.logger.Errorf("new qrcode failed")
+		c.logger.Errorf("new qrcode failed: %v", err)
 		os.Exit(-1)
 	}
 
 	if err := c.showQRCodeFunc(qrCode); err != nil {
-		c.logger.Errorf("show qrcode failed")
+		c.logger.Errorf("show qrcode failed: %v", err)
 		os.Exit(-1)
 	}
 
 	for {
 		resp, cookies, err := c.qrcodePoll(generateResp.QrcodeKey)
 		if err != nil {
-			c.logger.Errorf("poll qrcode failed")
+			c.logger.Errorf("poll qrcode failed: %v", err)
 			os.Exit(-1)
 		}
 
@@ -133,6 +144,12 @@ func (c *Client) LoginWithQrCode() {
 				Cookies:      cookies,
 				RefreshToken: resp.RefreshToken,
 			})
+			resp, err := c.getMyInfo()
+			if err != nil {
+				c.logger.Errorf("login failed: %v", err)
+				os.Exit(-1)
+			}
+			c.authInfo.User = resp
 			c.logger.Infof("login success!!!")
 			return
 		case 86038:
@@ -280,6 +297,22 @@ func (c *Client) UploadCoverFromHTTP(url string) (*UploadCoverResponse, error) {
 	defer resp.Body.Close()
 
 	return c.UploadCoverFromReader(resp.Body)
+}
+
+// GetMyInfo 获取当前用户信息
+func (c *Client) GetMyInfo() (*GetMyInfoResponse, error) {
+	if c.authInfo.User != nil {
+		return c.authInfo.User, nil
+	}
+	user, err := c.getMyInfo()
+	if err != nil {
+		return nil, err
+	}
+	c.authInfo.User = user
+
+	_ = c.authStorage.SaveAuthInfo(c.authInfo)
+
+	return user, nil
 }
 
 /* ===================== helper ===================== */
