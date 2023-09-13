@@ -399,3 +399,212 @@ func (c *Client) GetDocUploadCount(mid string) (*GetDocUploadCountResponse, erro
 
 	return rsp, err
 }
+
+// GetUserFollowers 查询用户粉丝列表 https://api.bilibili.com/x/relation/followers
+// mid 用户ID
+// ps 每页大小
+// pn 页码
+// 注意：查询别的用户粉丝数上限为250
+func (c *Client) GetUserFollowers(mid string, ps int, pn int) (*RelationUserResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/followers"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("vmid", mid).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("pn", strconv.Itoa(pn)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &RelationUserResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetUserFollowings 查询用户关注列表 https://api.bilibili.com/x/relation/followings
+// mid 用户ID
+// orderType 排序方式  按照关注顺序排列：留空  按照最常访问排列：attention
+// ps 每页大小
+// pn 页码
+// 注意：查询别的用户关注数上限为250
+func (c *Client) GetUserFollowings(mid string, orderType string, ps int, pn int) (*RelationUserResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/followings"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("vmid", mid).
+		AddParams("order_type", orderType).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("pn", strconv.Itoa(pn)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &RelationUserResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetUserFollowingsV2 查询用户关注列表 https://app.biliapi.net/x/v2/relation/followings
+// mid 用户ID
+// ps 每页大小
+// pn 页码
+// 注意：仅可查看前 5 页 可以获取已设置可见性隐私的关注列表
+func (c *Client) GetUserFollowingsV2(mid string, ps int, pn int) (*RelationUserResponse, error) {
+	uri := "https://app.biliapi.net/x/v2/relation/followings"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("vmid", mid).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("pn", strconv.Itoa(pn)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &RelationUserResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// SearchUserFollowings 搜索用户关注列表 https://api.bilibili.com/x/relation/followings/search
+// mid 目标用户ID
+// name 搜索关键词
+// ps 每页大小
+// pn 页码
+func (c *Client) SearchUserFollowings(mid string, name string, ps int, pn int) (*RelationUserResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/followings/search"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("vmid", mid).
+		AddParams("name", name).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("pn", strconv.Itoa(pn)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &RelationUserResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetSameFollowings 查询共同关注列表 https://api.bilibili.com/x/relation/same/followings
+// mid 目标用户ID
+// ps 每页大小
+// pn 页码
+func (c *Client) GetSameFollowings(mid string, ps int, pn int) (*RelationUserResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/same/followings"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("vmid", mid).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("pn", strconv.Itoa(pn)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &RelationUserResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetWhispers 查询悄悄关注列表 https://api.bilibili.com/x/relation/whispers
+// mid 目标用户ID
+// ps 每页大小
+// pn 页码
+// 只能查看自己的悄悄关注，total字段不返回，list 返回全部
+func (c *Client) GetWhispers() (*RelationUserResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/whispers"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &RelationUserResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetFriends 查询互相关注列表 https://api.bilibili.com/x/relation/friends
+// mid 目标用户ID
+// ps 每页大小
+// pn 页码
+// 只能查看自己的互相关注，total字段不返回，list 返回全部
+func (c *Client) GetFriends() (*RelationUserResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/friends"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &RelationUserResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetBlacks 查询黑名单列表 https://api.bilibili.com/x/relation/blacks
+// ps 每页大小
+// pn 页码
+func (c *Client) GetBlacks(ps int, pn int) (*RelationUserResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/blacks"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("pn", strconv.Itoa(pn)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &RelationUserResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}

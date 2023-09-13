@@ -13,7 +13,11 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	client.GetNavigation()
+	resp, err := client.GetBlacks(1, 1)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(resp.Total, len(resp.List))
 
 	//SearchUserInfo(client)
 
