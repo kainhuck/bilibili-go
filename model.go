@@ -648,3 +648,10 @@ type RelationUser struct {
 	RecReason string `json:"rec_reason"`
 	TrackId   string `json:"track_id"`
 }
+
+// GetUserFollowingsResponse 用户关注
+type GetUserFollowingsResponse struct {
+	List      []RelationUser `json:"list"` // 关注列表
+	ReVersion int            `json:"re_version"`
+	Total     int            `json:"total"` // 关注总数
+}

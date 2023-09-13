@@ -13,11 +13,11 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	resp, err := client.GetUserFollowers("2", 5, 10)
+	resp, err := client.GetUserFollowingsV2("2", 50, 1)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(resp.Total)
+	fmt.Println(resp.Total, len(resp.List))
 
 	//SearchUserInfo(client)
 

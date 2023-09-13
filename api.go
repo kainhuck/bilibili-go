@@ -404,7 +404,7 @@ func (c *Client) GetDocUploadCount(mid string) (*GetDocUploadCountResponse, erro
 // mid 用户ID
 // ps 每页大小
 // pn 页码
-// 注意：查询别的用户粉丝数上线为250
+// 注意：查询别的用户粉丝数上限为250
 func (c *Client) GetUserFollowers(mid string, ps int, pn int) (*GetUserFollowersResponse, error) {
 	uri := "https://api.bilibili.com/x/relation/followers"
 
@@ -422,6 +422,62 @@ func (c *Client) GetUserFollowers(mid string, ps int, pn int) (*GetUserFollowers
 	}
 
 	rsp := &GetUserFollowersResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetUserFollowings 查询用户关注列表 https://api.bilibili.com/x/relation/followings
+// mid 用户ID
+// orderType 排序方式  按照关注顺序排列：留空  按照最常访问排列：attention
+// ps 每页大小
+// pn 页码
+// 注意：查询别的用户关注数上限为250
+func (c *Client) GetUserFollowings(mid string, orderType string, ps int, pn int) (*GetUserFollowingsResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/followings"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("vmid", mid).
+		AddParams("order_type", orderType).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("pn", strconv.Itoa(pn)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &GetUserFollowingsResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetUserFollowingsV2 查询用户关注列表 https://app.biliapi.net/x/v2/relation/followings
+// mid 用户ID
+// ps 每页大小
+// pn 页码
+// 注意：仅可查看前 5 页 可以获取已设置可见性隐私的关注列表
+func (c *Client) GetUserFollowingsV2(mid string, ps int, pn int) (*GetUserFollowingsResponse, error) {
+	uri := "https://app.biliapi.net/x/v2/relation/followings"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("vmid", mid).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("pn", strconv.Itoa(pn)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &GetUserFollowingsResponse{}
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
 	return rsp, err
