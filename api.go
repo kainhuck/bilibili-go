@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -646,4 +647,40 @@ func (c *Client) ModifyRelation(mid string, act int, reSrc int) error {
 	}
 
 	return nil
+}
+
+// BatchModifyRelation 批量操作用户关系 https://api.bilibili.com/x/relation/batch/modify
+// mids 目标用户mid
+// act 操作代码
+//
+//	1 关注
+//	5 拉黑
+//
+// reSrc 关注来源
+//
+//	11 空间
+//	14 视频
+//	115 文章
+//	222 活动页面
+func (c *Client) BatchModifyRelation(mids []string, act int, reSrc int) (*BatchModifyRelationResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/batch/modify"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("fids", strings.Join(mids, ",")).
+		AddFormData("act", strconv.Itoa(act)).
+		AddFormData("re_src", strconv.Itoa(reSrc)).
+		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &BatchModifyRelationResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
 }

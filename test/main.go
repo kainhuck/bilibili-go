@@ -13,7 +13,7 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	err := client.ModifyRelation("2", 1, 11)
+	_, err := client.BatchModifyRelation([]string{"3", "4"}, 1, 11)
 	if err != nil {
 		log.Fatal(err)
 	}
