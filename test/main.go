@@ -9,11 +9,13 @@ import (
 func main() {
 	client := bilibili_go.NewClient(
 		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.json")),
-		bilibili_go.WithDebug(false),
+		bilibili_go.WithDebug(true),
 	)
 	client.LoginWithQrCode()
 
-	SearchUserInfo(client)
+	client.GetNavigation()
+
+	//SearchUserInfo(client)
 
 	//SubmitVideo(client)
 }
