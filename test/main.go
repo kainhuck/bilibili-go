@@ -9,15 +9,11 @@ import (
 func main() {
 	client := bilibili_go.NewClient(
 		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.json")),
-		bilibili_go.WithDebug(false),
+		bilibili_go.WithDebug(true),
 	)
 	client.LoginWithQrCode()
 
-	resp, err := client.GetDocUploadCount("13868000")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(resp)
+	client.GetNavigation()
 
 	//SearchUserInfo(client)
 
@@ -34,7 +30,7 @@ func SubmitVideo(client *bilibili_go.Client) {
 	log.Println("视频上传成功")
 
 	// 2. 上传封面
-	cover, err := client.UploadCover("/Users/edy/Downloads/cover.jpeg")
+	cover, err := client.UploadCoverFromDisk("/Users/edy/Downloads/cover.jpeg")
 	if err != nil {
 		log.Fatal(err)
 	}

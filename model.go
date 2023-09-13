@@ -350,7 +350,7 @@ type GetUserInfoResponse struct {
 		URL           string `json:"url"`
 		Title         string `json:"title"`
 		Cover         string `json:"cover"`
-		Roomid        int    `json:"roomid"`
+		RoomId        int    `json:"roomid"`
 		RoundStatus   int    `json:"roundStatus"`
 		BroadcastType int    `json:"broadcast_type"`
 		WatchedShow   struct {
@@ -411,8 +411,8 @@ type GetUserCardResponse struct {
 		FaceNft     int           `json:"face_nft"`      // 是否是nft头像 0 否 1 是
 		FaceNftType int           `json:"face_nft_type"` // nft头像类别？
 		DisplayRank string        `json:"DisplayRank"`   // ？
-		Regtime     int64         `json:"regtime"`       // ？
-		Spacesta    int           `json:"spacesta"`      // ？
+		RegTime     int64         `json:"regtime"`       // ？
+		SpaceSta    int           `json:"spacesta"`      // ？
 		Birthday    string        `json:"birthday"`      // 空
 		Place       string        `json:"place"`         // 空
 		Description string        `json:"description"`   // 空
@@ -430,7 +430,7 @@ type GetUserCardResponse struct {
 		} `json:"level_info"`
 		Pendant struct { // 挂件
 			Pid               int    `json:"pid"`
-			Name              string `json:"na"`
+			Name              string `json:"name"`
 			Expire            int    `json:"expire"`
 			ImageEnhance      string `json:"image_enhance"`
 			ImageEnhanceFrame string `json:"image_enhance_frame"`
@@ -454,12 +454,12 @@ type GetUserCardResponse struct {
 			Desc string `json:"desc"`
 		} `json:"official_verify"`
 		VIP struct { // 会员信息
-			Type      int   `json:"type"`
-			Status    int   `json:"status"`
-			DueDate   int64 `json:"due_date"`
-			PayType   int   `json:"vip_pay_type"`
-			ThemeType int   `json:"theme_type"`
-			Label     struct {
+			Type       int   `json:"type"`
+			Status     int   `json:"status"`
+			DueDate    int64 `json:"due_date"`
+			VipPayType int   `json:"vip_pay_type"`
+			ThemeType  int   `json:"theme_type"`
+			Label      struct {
 				Path                  string `json:"path"`
 				Text                  string `json:"text"`
 				LabelTheme            string `json:"label_theme"`
@@ -524,7 +524,7 @@ type GetMyInfoResponse struct {
 		ShowName        string `json:"show_name"`
 		IsShow          int    `json:"is_show"`
 		CategoryOne     string `json:"category_one"`
-		Realname        string `json:"realname"`
+		RealName        string `json:"realname"`
 		Title           string `json:"title"`
 		Department      string `json:"department"`
 		CertificateNo   string `json:"certificate_no"`

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 )
@@ -194,18 +193,14 @@ func (c *Client) uploadCheck(uri string, auth string, filename string, uploadID 
 }
 
 // UploadCover 上传封面 https://member.bilibili.com/x/vu/web/cover/up
-func (c *Client) UploadCover(image string) (*UploadCoverResponse, error) {
+func (c *Client) UploadCover(imageData []byte) (*UploadCoverResponse, error) {
 	uri := "https://member.bilibili.com/x/vu/web/cover/up"
 
-	imageData, err := os.ReadFile(image)
-	if err != nil {
-		return nil, err
-	}
 	base64Str := base64.StdEncoding.EncodeToString(imageData)
 
 	var baseResp BaseResponse
 
-	err = c.getHttpClient(true).Post(uri).
+	err := c.getHttpClient(true).Post(uri).
 		AddParams("t", strconv.FormatInt(time.Now().UnixMilli(), 10)).
 		AddFormData("cover", "data:image/jpeg;base64,"+base64Str).
 		AddFormData("csrf", c.cookieCache["bili_jct"]).
@@ -323,8 +318,8 @@ func (c *Client) GetUserCard(mid string, photo bool) (*GetUserCardResponse, erro
 	return rsp, err
 }
 
-// GetMyInfo 登陆用户空间详细信息 https://api.bilibili.com/x/space/myinfo
-func (c *Client) GetMyInfo() (*GetMyInfoResponse, error) {
+// getMyInfo 登陆用户空间详细信息 https://api.bilibili.com/x/space/myinfo
+func (c *Client) getMyInfo() (*GetMyInfoResponse, error) {
 	uri := "https://api.bilibili.com/x/space/myinfo"
 
 	var baseResp BaseResponse
