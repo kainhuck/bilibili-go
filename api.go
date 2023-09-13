@@ -399,3 +399,30 @@ func (c *Client) GetDocUploadCount(mid string) (*GetDocUploadCountResponse, erro
 
 	return rsp, err
 }
+
+// GetUserFollowers 查询用户粉丝列表 https://api.bilibili.com/x/relation/followers
+// mid 用户ID
+// ps 每页大小
+// pn 页码
+// 注意：查询别的用户粉丝数上线为250
+func (c *Client) GetUserFollowers(mid string, ps int, pn int) (*GetUserFollowersResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/followers"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("vmid", mid).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("pn", strconv.Itoa(pn)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &GetUserFollowersResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}

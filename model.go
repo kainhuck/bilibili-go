@@ -600,3 +600,51 @@ type GetDocUploadCountResponse struct {
 	PhotoCount int `json:"photo_count"` // 发布摄影数
 	DailyCount int `json:"daily_count"` // 发布日常（图片动态）数
 }
+
+// GetUserFollowersResponse 用户粉丝
+type GetUserFollowersResponse struct {
+	List      []RelationUser `json:"list"` // 粉丝列表
+	ReVersion int            `json:"re_version"`
+	Total     int            `json:"total"` // 粉丝总数
+}
+
+type RelationUser struct {
+	Mid            int      `json:"mid"`
+	Attribute      int      `json:"attribute"`     // 0 未关注 1 已关注 2 已关注 6 已互粉 128 已拉黑
+	Mtime          int      `json:"mtime"`         // 关注对方时间
+	Tag            []string `json:"tag"`           // 分组ID
+	Special        int      `json:"special"`       // 特别关注标志 0 否 1 是
+	ContractInfo   struct{} `json:"contract_info"` // unknown
+	Uname          string   `json:"uname"`
+	Face           string   `json:"face"`
+	Sign           string   `json:"sign"`
+	FaceNft        int      `json:"face_nft"`
+	OfficialVerify struct {
+		Type int    `json:"type"`
+		Desc string `json:"desc"`
+	} `json:"official_verify"`
+	Vip struct {
+		VipType       int    `json:"vipType"`
+		VipDueDate    int64  `json:"vipDueDate"`
+		DueRemark     string `json:"dueRemark"`
+		AccessStatus  int    `json:"accessStatus"`
+		VipStatus     int    `json:"vipStatus"`
+		VipStatusWarn string `json:"vipStatusWarn"`
+		ThemeType     int    `json:"themeType"`
+		Label         struct {
+			Path        string `json:"path"`
+			Text        string `json:"text"`
+			LabelTheme  string `json:"label_theme"`
+			TextColor   string `json:"text_color"`
+			BgStyle     int    `json:"bg_style"`
+			BgColor     string `json:"bg_color"`
+			BorderColor string `json:"border_color"`
+		} `json:"label"`
+		AvatarSubscript    int    `json:"avatar_subscript"`
+		NicknameColor      string `json:"nickname_color"`
+		AvatarSubscriptUrl string `json:"avatar_subscript_url"`
+	} `json:"vip"`
+	NftIcon   string `json:"nft_icon"`
+	RecReason string `json:"rec_reason"`
+	TrackId   string `json:"track_id"`
+}
