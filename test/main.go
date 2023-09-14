@@ -13,7 +13,7 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	resp, err := client.GetAccRelation("430053187")
+	resp, err := client.BatchGetRelation("430053187")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -728,3 +728,25 @@ func (c *Client) GetAccRelation(mid string) (*AccRelation, error) {
 
 	return rsp, err
 }
+
+// BatchGetRelation 批量查询用户与自己的关系 https://api.bilibili.com/x/relation/relations
+// 返回的key是mid
+func (c *Client) BatchGetRelation(mid ...string) (map[string]Relation, error) {
+	uri := "https://api.bilibili.com/x/relation/relations"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("fids", strings.Join(mid, ",")).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := make(map[string]Relation)
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
