@@ -14,13 +14,13 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	//resp, err := client.GetRelationTags()
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//fmt.Println(resp)
+	resp, err := client.GetRelationTagUsers(0, "", 20, 1)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(resp[0])
 
-	RelationDemo(client)
+	//RelationDemo(client)
 
 	//SearchUserInfo(client)
 

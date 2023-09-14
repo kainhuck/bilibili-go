@@ -796,3 +796,32 @@ func (c *Client) GetRelationTags() ([]*RelationTag, error) {
 
 	return rsp, err
 }
+
+// GetRelationTagUsers 查询关注分组内的用户 https://api.bilibili.com/x/relation/tag
+// tagId 关注分组id 可通过 GetRelationTags 接口获取
+// orderType 按照关注顺序排列：留空 按照最常访问排列：attention
+// ps 每页项数
+// pn 页码
+func (c *Client) GetRelationTagUsers(tagId int, orderType string, ps int, pn int) ([]*RelationUser, error) {
+	uri := "https://api.bilibili.com/x/relation/tag"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("tagid", strconv.Itoa(tagId)).
+		AddParams("order_type", orderType).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("pn", strconv.Itoa(pn)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := make([]*RelationUser, 0)
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
