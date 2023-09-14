@@ -20,6 +20,10 @@ func (c *Client) qrcodeGenerate() (*QrcodeGenerateResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
 
 	rsp := &QrcodeGenerateResponse{}
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
@@ -44,6 +48,10 @@ func (c *Client) qrcodePoll(qrcodeKey string) (*QrcodePollResponse, []*http.Cook
 	if err != nil {
 		return nil, nil, err
 	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, nil, fmt.Errorf("%s", bts)
+	}
 
 	rsp := &QrcodePollResponse{}
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
@@ -60,7 +68,7 @@ func (c *Client) GetAccount() (*AccountResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -80,7 +88,7 @@ func (c *Client) GetNavigation() (*NavigationResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -100,7 +108,7 @@ func (c *Client) GetNavigationStatus() (*NavigationStatusResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -212,7 +220,7 @@ func (c *Client) UploadCover(imageData []byte) (*UploadCoverResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -247,7 +255,7 @@ func (c *Client) SubmitVideo(req *SubmitRequest) (*SubmitResponse, error) {
 		return nil, err
 	}
 
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -267,7 +275,7 @@ func (c *Client) GetCoin() (*GetCoinResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -290,7 +298,7 @@ func (c *Client) GetUserInfo(mid string) (*GetUserInfoResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -316,7 +324,7 @@ func (c *Client) GetUserCard(mid string, photo bool) (*GetUserCardResponse, erro
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -336,7 +344,7 @@ func (c *Client) getMyInfo() (*GetMyInfoResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -358,7 +366,7 @@ func (c *Client) GetRelationStat(mid string) (*GetRelationStatResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -380,7 +388,7 @@ func (c *Client) GetUpStat(mid string) (*GetUpStatResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -402,7 +410,7 @@ func (c *Client) GetDocUploadCount(mid string) (*GetDocUploadCountResponse, erro
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -430,7 +438,7 @@ func (c *Client) GetUserFollowers(mid string, ps int, pn int) (*RelationUserResp
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -460,7 +468,7 @@ func (c *Client) GetUserFollowings(mid string, orderType string, ps int, pn int)
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -488,7 +496,7 @@ func (c *Client) GetUserFollowingsV2(mid string, ps int, pn int) (*RelationUserR
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -517,7 +525,7 @@ func (c *Client) SearchUserFollowings(mid string, name string, ps int, pn int) (
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -544,7 +552,7 @@ func (c *Client) GetSameFollowings(mid string, ps int, pn int) (*RelationUserRes
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -569,7 +577,7 @@ func (c *Client) GetWhispers() (*RelationUserResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -594,7 +602,7 @@ func (c *Client) GetFriends() (*RelationUserResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -619,7 +627,7 @@ func (c *Client) GetBlacks(ps int, pn int) (*RelationUserResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -662,7 +670,7 @@ func (c *Client) ModifyRelation(mid string, act int, reSrc int) error {
 	if err != nil {
 		return err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return fmt.Errorf("%s", bts)
 	}
@@ -696,7 +704,7 @@ func (c *Client) BatchModifyRelation(mids []string, act int, reSrc int) (*BatchM
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -719,7 +727,7 @@ func (c *Client) GetRelation(mid string) (*Relation, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -742,7 +750,7 @@ func (c *Client) GetAccRelation(mid string) (*AccRelation, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -765,7 +773,7 @@ func (c *Client) BatchGetRelation(mid ...string) (map[string]Relation, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -786,7 +794,7 @@ func (c *Client) GetRelationTags() ([]*RelationTag, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -815,7 +823,7 @@ func (c *Client) GetRelationTagUsers(tagId int, orderType string, ps int, pn int
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -839,7 +847,7 @@ func (c *Client) QueryRelationTagByUser(mid string) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -861,7 +869,7 @@ func (c *Client) GetSpecialRelationTagUsers() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -885,7 +893,7 @@ func (c *Client) CreateRelationTag(name string) (*CreateRelationTagResponse, err
 	if err != nil {
 		return nil, err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return nil, fmt.Errorf("%s", bts)
 	}
@@ -912,7 +920,123 @@ func (c *Client) UpdateRelationTag(tagId int, name string) error {
 	if err != nil {
 		return err
 	}
-	if baseResp.Code != 0 {
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return fmt.Errorf("%s", bts)
+	}
+
+	return nil
+}
+
+// DeleteRelationTag 删除分组 https://api.bilibili.com/x/relation/tag/del
+func (c *Client) DeleteRelationTag(tagId int) error {
+	uri := "https://api.bilibili.com/x/relation/tag/del"
+
+	var baseResp BaseResponse
+
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("tagid", strconv.Itoa(tagId)).
+		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return fmt.Errorf("%s", bts)
+	}
+
+	return nil
+}
+
+// AddUsersToRelationTags 往分组内添加成员 https://api.bilibili.com/x/relation/tags/addUsers
+// 通过该接口可以将多个用户移动到多个分组
+// 如需移除分组中的成员，请将tagids设为 0，即移动至默认分组，而不是取关
+// mids 用户ID
+// tagIds 分组ID
+func (c *Client) AddUsersToRelationTags(mids []string, tagIds []int) error {
+	uri := "https://api.bilibili.com/x/relation/tags/addUsers"
+
+	tagIdsString := make([]string, 0, len(tagIds))
+	for _, each := range tagIds {
+		tagIdsString = append(tagIdsString, strconv.Itoa(each))
+	}
+
+	var baseResp BaseResponse
+
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("fids", strings.Join(mids, ",")).
+		AddFormData("tagids", strings.Join(tagIdsString, ",")).
+		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return fmt.Errorf("%s", bts)
+	}
+
+	return nil
+}
+
+// CopyUsersToRelationTags 复制成员到分组 https://api.bilibili.com/x/relation/tags/copyUsers
+// mids 用户ID
+// tagIds 分组ID
+func (c *Client) CopyUsersToRelationTags(mids []string, tagIds []int) error {
+	uri := "https://api.bilibili.com/x/relation/tags/copyUsers"
+
+	tagIdsString := make([]string, 0, len(tagIds))
+	for _, each := range tagIds {
+		tagIdsString = append(tagIdsString, strconv.Itoa(each))
+	}
+
+	var baseResp BaseResponse
+
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("fids", strings.Join(mids, ",")).
+		AddFormData("tagids", strings.Join(tagIdsString, ",")).
+		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return fmt.Errorf("%s", bts)
+	}
+
+	return nil
+}
+
+// MoveUsersToRelationTags 复制成员到分组 https://api.bilibili.com/x/relation/tags/moveUsers
+// mids 用户ID
+// tagIds 分组ID
+func (c *Client) MoveUsersToRelationTags(mids []string, beforeTagIds []int, afterTagIds []int) error {
+	uri := "https://api.bilibili.com/x/relation/tags/moveUsers"
+
+	beforeTagIdsString := make([]string, 0, len(beforeTagIds))
+	for _, each := range beforeTagIds {
+		beforeTagIdsString = append(beforeTagIdsString, strconv.Itoa(each))
+	}
+
+	afterTagIdsString := make([]string, 0, len(afterTagIds))
+	for _, each := range afterTagIds {
+		afterTagIdsString = append(afterTagIdsString, strconv.Itoa(each))
+	}
+
+	var baseResp BaseResponse
+
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("fids", strings.Join(mids, ",")).
+		AddFormData("beforeTagids", strings.Join(beforeTagIdsString, ",")).
+		AddFormData("afterTagids", strings.Join(afterTagIdsString, ",")).
+		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return err
+	}
+	if baseResp.Code != CodeSuccess {
 		bts, _ := json.Marshal(baseResp)
 		return fmt.Errorf("%s", bts)
 	}

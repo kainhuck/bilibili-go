@@ -15,10 +15,9 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	//printIt(client.CreateRelationTag("兄弟"))
-
-	client.UpdateRelationTag(119496880, "abc")
+	printIt(client.GetFriends())
 	printIt(client.GetRelationTags())
+	printIt(client.GetRelationTagUsers(-10, "", 1, 1))
 
 	//RelationDemo(client)
 

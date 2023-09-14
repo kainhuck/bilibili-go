@@ -7,9 +7,26 @@ import (
 	"strings"
 )
 
+type Code int
+
+const (
+	// CodeSuccess 成功
+	CodeSuccess Code = 0
+	// CodeCsrfFailed csrf校验失败
+	CodeCsrfFailed Code = -111
+	// CodeUnLogin 账号未登录
+	CodeUnLogin Code = -101
+	// CodeRequestError 请求错误
+	CodeRequestError Code = -400
+	// CodePermissionDenied 没有权限
+	CodePermissionDenied Code = 22104
+	// CodeUnFollowed 未关注
+	CodeUnFollowed Code = 22105
+)
+
 // BaseResponse dor base response
 type BaseResponse struct {
-	Code    int         `json:"code"`
+	Code    Code        `json:"code"`
 	Message string      `json:"message"`
 	TTL     int         `json:"ttl"`
 	Data    interface{} `json:"data"`
