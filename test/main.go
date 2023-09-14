@@ -14,10 +14,11 @@ func main() {
 		bilibili_go.WithDebug(true),
 	)
 	client.LoginWithQrCode()
+	defer client.Logout()
 
 	printIt(client.GetFriends())
-	printIt(client.GetRelationTags())
-	printIt(client.GetRelationTagUsers(-10, "", 1, 1))
+	//printIt(client.GetRelationTags())
+	//printIt(client.GetRelationTagUsers(-10, "", 1, 1))
 
 	//RelationDemo(client)
 
@@ -73,7 +74,7 @@ func SearchUserInfo(client *bilibili_go.Client) {
 	fmt.Printf("用户名：%v，粉丝数：%v，头衔：%v\n", card.Card.Name, card.Card.Fans, card.Card.Official.Title)
 
 	// 2. 查询自身信息
-	resp, err := client.GetMyInfo()
+	resp, err := client.GetMyInfo(false)
 	if err != nil {
 		log.Fatal(err)
 	}

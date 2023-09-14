@@ -163,6 +163,24 @@ func (c *Client) LoginWithQrCode() {
 	}
 }
 
+// Logout 退出登陆 会返回重定向链接
+func (c *Client) Logout() (string, error) {
+	resp, err := c.logout()
+	if err != nil {
+		return "", err
+	}
+
+	if c.authStorage != nil {
+		if err := c.authStorage.LogoutAuthInfo(c.authInfo); err != nil {
+			c.logger.Errorf("call LogoutAuthInfo failed: %v", err)
+		}
+	}
+
+	c.authInfo = nil
+
+	return resp.RedirectUrl, nil
+}
+
 // UploadVideoFromDisk 从本地磁盘上传视频 videoPath 视频路径
 func (c *Client) UploadVideoFromDisk(videoPath string) (*Video, error) {
 	fileInfo, err := os.Stat(videoPath)
@@ -303,8 +321,8 @@ func (c *Client) UploadCoverFromHTTP(url string) (*UploadCoverResponse, error) {
 }
 
 // GetMyInfo 获取当前用户信息
-func (c *Client) GetMyInfo() (*GetMyInfoResponse, error) {
-	if c.authInfo.User != nil {
+func (c *Client) GetMyInfo(refresh bool) (*GetMyInfoResponse, error) {
+	if c.authInfo.User != nil && !refresh {
 		return c.authInfo.User, nil
 	}
 	user, err := c.getMyInfo()

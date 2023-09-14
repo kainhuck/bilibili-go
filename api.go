@@ -1043,3 +1043,25 @@ func (c *Client) MoveUsersToRelationTags(mids []string, beforeTagIds []int, afte
 
 	return nil
 }
+
+// logout 退出登陆 https://passport.bilibili.com/login/exit/v2
+func (c *Client) logout() (*LogoutResponse, error) {
+	uri := "https://passport.bilibili.com/login/exit/v2"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("biliCSRF", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &LogoutResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}

@@ -57,6 +57,9 @@
 
           // SaveAuthInfo 保存AuthInfo
           SaveAuthInfo(*AuthInfo) error
+      
+          // LogoutAuthInfo 账号退出登陆时会调用该方法
+          LogoutAuthInfo(*AuthInfo) error
       }
       ```
       默认提供了一个文件缓存的实现`fileAuthStorage`可以如下使用
@@ -134,6 +137,9 @@
 [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
 
 ## 更新日志 🐥
+
+### v0.3.4
+1. 新增登出功能
 
 ### v0.3.3
 1. 封装了关系操作接口

@@ -18,6 +18,9 @@ type AuthStorage interface {
 
 	// SaveAuthInfo 保存AuthInfo
 	SaveAuthInfo(*AuthInfo) error
+
+	// LogoutAuthInfo 账号退出登陆时会调用该方法
+	LogoutAuthInfo(*AuthInfo) error
 }
 
 type fileAuthStorage struct {
@@ -52,6 +55,10 @@ func (f fileAuthStorage) SaveAuthInfo(info *AuthInfo) error {
 	_, err = file.Write(bts)
 
 	return err
+}
+
+func (f fileAuthStorage) LogoutAuthInfo(*AuthInfo) error {
+	return nil
 }
 
 func NewFileAuthStorage(file string) AuthStorage {

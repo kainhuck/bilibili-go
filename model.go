@@ -713,3 +713,8 @@ type RelationTag struct {
 type CreateRelationTagResponse struct {
 	TagId int `json:"tagid"`
 }
+
+// LogoutResponse 登出
+type LogoutResponse struct {
+	RedirectUrl string `json:"redirectUrl"`
+}
