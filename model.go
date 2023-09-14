@@ -691,3 +691,8 @@ type RelationTag struct {
 	Count int    `json:"count"` // 分组成员数
 	Tip   string `json:"tip"`   // 提示信息
 }
+
+// CreateRelationTagResponse 创建分组
+type CreateRelationTagResponse struct {
+	TagId int `json:"tagid"`
+}

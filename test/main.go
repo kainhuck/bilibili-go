@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	bilibili_go "github.com/kainhuck/bilibili-go"
 	"log"
@@ -10,15 +11,14 @@ import (
 func main() {
 	client := bilibili_go.NewClient(
 		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.json")),
-		bilibili_go.WithDebug(false),
+		bilibili_go.WithDebug(true),
 	)
 	client.LoginWithQrCode()
 
-	resp, err := client.GetRelationTagUsers(0, "", 20, 1)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(resp[0])
+	//printIt(client.CreateRelationTag("兄弟"))
+
+	client.UpdateRelationTag(119496880, "abc")
+	printIt(client.GetRelationTags())
 
 	//RelationDemo(client)
 
@@ -106,4 +106,12 @@ func RelationDemo(client *bilibili_go.Client) {
 			fmt.Printf("名字: %v\tmid: %v\t性别: %v\t粉丝数: %v\t等级: %v\n", user.Card.Name, user.Card.Mid, user.Card.Sex, user.Card.Fans, user.Card.LevelInfo.CurrentLevel)
 		}
 	}
+}
+
+func printIt(a any, err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+	bts, _ := json.MarshalIndent(a, "", "  ")
+	fmt.Println(string(bts))
 }

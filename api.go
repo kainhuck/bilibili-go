@@ -825,3 +825,97 @@ func (c *Client) GetRelationTagUsers(tagId int, orderType string, ps int, pn int
 
 	return rsp, err
 }
+
+// QueryRelationTagByUser 查询用户所在的分组 https://api.bilibili.com/x/relation/tag/user
+// mid 用户ID
+// 返回的 key 是分组ID， value 是分组名称
+func (c *Client) QueryRelationTagByUser(mid string) (map[string]string, error) {
+	uri := "https://api.bilibili.com/x/relation/tag/user"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("fid", mid).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := make(map[string]string)
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetSpecialRelationTagUsers 查询特别关注的所有用户mid https://api.bilibili.com/x/relation/tag/special
+// 返回所有用户的mid
+func (c *Client) GetSpecialRelationTagUsers() ([]string, error) {
+	uri := "https://api.bilibili.com/x/relation/tag/special"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := make([]string, 0)
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// CreateRelationTag 创建分组 https://api.bilibili.com/x/relation/tag/create
+// name 分组名称
+func (c *Client) CreateRelationTag(name string) (*CreateRelationTagResponse, error) {
+	uri := "https://api.bilibili.com/x/relation/tag/create"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("tag", name).
+		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &CreateRelationTagResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// UpdateRelationTag 更新分组 https://api.bilibili.com/x/relation/tag/update
+// tagId 分组ID
+// name 分组新名称
+func (c *Client) UpdateRelationTag(tagId int, name string) error {
+	uri := "https://api.bilibili.com/x/relation/tag/update"
+
+	var baseResp BaseResponse
+
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("tagid", strconv.Itoa(tagId)).
+		AddFormData("name", name).
+		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return err
+	}
+	if baseResp.Code != 0 {
+		bts, _ := json.Marshal(baseResp)
+		return fmt.Errorf("%s", bts)
+	}
+
+	return nil
+}
