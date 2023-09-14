@@ -315,6 +315,36 @@ func (c *Client) GetMyInfo() (*GetMyInfoResponse, error) {
 	return user, nil
 }
 
+// Follow 关注用户
+func (c *Client) Follow(mid string) error {
+	return c.ModifyRelation(mid, 1, 11)
+}
+
+// UnFollow 取关用户
+func (c *Client) UnFollow(mid string) error {
+	return c.ModifyRelation(mid, 2, 11)
+}
+
+// WhisperFollow 悄悄关注
+func (c *Client) WhisperFollow(mid string) error {
+	return c.ModifyRelation(mid, 3, 11)
+}
+
+// UnWhisperFollow 取消悄悄关注
+func (c *Client) UnWhisperFollow(mid string) error {
+	return c.ModifyRelation(mid, 4, 11)
+}
+
+// Block 拉黑用户
+func (c *Client) Block(mid string) error {
+	return c.ModifyRelation(mid, 5, 11)
+}
+
+// UnBlock 取消拉黑
+func (c *Client) UnBlock(mid string) error {
+	return c.ModifyRelation(mid, 6, 11)
+}
+
 /* ===================== helper ===================== */
 
 func (c *Client) getHttpClient(auth bool) *net.HttpClient {
