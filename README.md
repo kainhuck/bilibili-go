@@ -49,7 +49,7 @@
    
    2. 缓存cookie
       
-      用户可以实现下面这个接口来定义自己的存储
+      用户可以实现下面这个接口来定义自己的存储，如果设置了缓存，在第二次登陆时将不再需要授权，除非缓存过期，在加载缓存时会自动校验授权信息是否过期
       ```go
       type AuthStorage interface {
           // LoadAuthInfo 加载AuthInfo
@@ -97,6 +97,38 @@
           }),
       )
       ```
+      
+   5. 自定义User-Agent 
+      
+      默认UA: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"
+      ```go
+      client := bilibili_go.NewClient(
+		bilibili_go.WithUserAgent("abc"),
+      )
+      ```
+   
+   6. 使用自定义logger
+      
+      用户可以设置任何实现了`Logger`接口的日志，默认使用`logrus.StandardLogger()`
+      ```go
+      type Logger interface {
+          Debug(args ...any)
+          Info(args ...any)
+          Warn(args ...any)
+          Error(args ...any)
+          Debugf(format string, args ...any)
+          Infof(format string, args ...any)
+          Warnf(format string, args ...any)
+          Errorf(format string, args ...any)
+      }
+      ```
+      ```go
+      client := bilibili_go.NewClient(
+          bilibili_go.WithLogger(log),
+      )
+      client.LoginWithQrCode()
+      ```
+
 
 ## 特别鸣谢 🥰
 
