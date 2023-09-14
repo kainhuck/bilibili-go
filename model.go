@@ -677,3 +677,9 @@ type Relation struct {
 	Tag       []int     `json:"tag"`
 	Special   int       `json:"special"` // 1 特别关注
 }
+
+// AccRelation 相互关系
+type AccRelation struct {
+	Relation   Relation `json:"relation"`
+	BeRelation Relation `json:"be_relation"`
+}

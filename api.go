@@ -706,3 +706,25 @@ func (c *Client) GetRelation(mid string) (*Relation, error) {
 
 	return rsp, err
 }
+
+// GetAccRelation 查询用户与自己的互相关系 https://api.bilibili.com/x/space/wbi/acc/relation
+func (c *Client) GetAccRelation(mid string) (*AccRelation, error) {
+	uri := "https://api.bilibili.com/x/space/wbi/acc/relation"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("mid", mid).
+		SetWbiKey(c.getWbiKeyCached()).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &AccRelation{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
