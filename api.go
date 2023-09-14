@@ -684,3 +684,25 @@ func (c *Client) BatchModifyRelation(mids []string, act int, reSrc int) (*BatchM
 
 	return rsp, err
 }
+
+// GetRelation 查询用户与自己的关系 https://api.bilibili.com/x/relation
+// mid 用户ID
+func (c *Client) GetRelation(mid string) (*Relation, error) {
+	uri := "https://api.bilibili.com/x/relation"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("fid", mid).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		return nil, fmt.Errorf(baseResp.Message)
+	}
+
+	rsp := &Relation{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}

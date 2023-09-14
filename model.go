@@ -655,3 +655,25 @@ type RelationUser struct {
 type BatchModifyRelationResponse struct {
 	FailedFids []string `json:"failed_fids"` // 操作失败的 mid 列表
 }
+
+type Attribute int
+
+const (
+	// UnFollowed 未关注
+	UnFollowed Attribute = 0
+	// Followed 已关注
+	Followed Attribute = 2
+	// FollowEachOther 已互粉
+	FollowEachOther Attribute = 6
+	// InBlacklist 已拉黑
+	InBlacklist Attribute = 128
+)
+
+// Relation 关系
+type Relation struct {
+	Mid       int       `json:"mid"`
+	Attribute Attribute `json:"attribute"`
+	MTime     int64     `json:"mtime"` // 关注对方时间
+	Tag       []int     `json:"tag"`
+	Special   int       `json:"special"` // 1 特别关注
+}
