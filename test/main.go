@@ -10,7 +10,8 @@ import (
 
 func main() {
 	client := bilibili_go.NewClient(
-		bilibili_go.WithLogger(log),
+		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.json")),
+		bilibili_go.WithDebug(true),
 	)
 	client.LoginWithQrCode()
 
