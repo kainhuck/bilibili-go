@@ -27,6 +27,76 @@
 
     参考 👉[demo](test/main.go)
 
+4. options介绍
+
+   1. 使用代理客户端
+         
+      ```go
+      proxyURL, err := url.Parse("http://proxy.example.com:8080")
+      if err != nil {
+          panic(err)
+      }
+      
+      client := bilibili_go.NewClient(
+          bilibili_go.WithHttpClient(&http.Client{
+              Transport: &http.Transport{
+                  Proxy: http.ProxyURL(proxyURL),
+              }
+          }),
+      )
+      ```
+   
+   2. 缓存cookie
+      
+      用户可以实现下面这个接口来定义自己的存储
+      ```go
+      type AuthStorage interface {
+          // LoadAuthInfo 加载AuthInfo
+          LoadAuthInfo() (*AuthInfo, error)
+
+          // SaveAuthInfo 保存AuthInfo
+          SaveAuthInfo(*AuthInfo) error
+      }
+      ```
+      默认提供了一个文件缓存的实现`fileAuthStorage`可以如下使用
+      ```go
+      cient := bilibili_go.NewClient(
+           bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("文件路径")),
+      )
+      ```
+         
+   3. 开启调试
+      
+      开启debug模式后，将会向指定的文件中写入http的报文
+      ```go
+      client := bilibili_go.NewClient(
+           bilibili_go.WithDebug(true), // 将会向 stdout 输出http报文
+      )
+      ```
+      ```go
+      f, err := os.Open("debug.txt")
+      if err != nil {
+          panic(err)
+      }
+      defer f.Close()
+
+      client := bilibili_go.NewClient(
+          bilibili_go.WithDebug(true, f), // 将会向 debug.txt 输出http报文
+      )
+      ```
+      
+   4. 自定义处理登陆二维码
+      
+      在使用`LoginWithQrCode`方法登陆时，默认会将登陆二维码输出到标准输出，用户可以配置自己的输出方法来自定义处理登陆二维码，比如将其发送到指定的群组或个人
+      ```go
+      client := bilibili_go.NewClient(
+		  bilibili_go.WithShowQRCodeFunc(func(code *qrcode.QRCode) error {
+			  // ....
+			  return nil
+          }),
+      )
+      ```
+
 ## 特别鸣谢 🥰
 
 [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)

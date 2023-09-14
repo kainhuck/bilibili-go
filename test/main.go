@@ -4,14 +4,25 @@ import (
 	"encoding/json"
 	"fmt"
 	bilibili_go "github.com/kainhuck/bilibili-go"
+	"github.com/skip2/go-qrcode"
 	"log"
+	"os"
 	"strconv"
 )
 
 func main() {
+
+	f, err := os.Open("debug.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
 	client := bilibili_go.NewClient(
-		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.json")),
-		bilibili_go.WithDebug(true),
+		bilibili_go.WithShowQRCodeFunc(func(code *qrcode.QRCode) error {
+			// ....
+			return nil
+		}),
 	)
 	client.LoginWithQrCode()
 
