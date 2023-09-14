@@ -29,7 +29,8 @@
 
 4. options介绍
 
-   1. 使用代理客户端
+   1. 自定义http客户端
+      用户可以通过自定义http客户端来使用代理或者其他需求，比如
          
       ```go
       proxyURL, err := url.Parse("http://proxy.example.com:8080")
