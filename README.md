@@ -126,7 +126,6 @@
       client := bilibili_go.NewClient(
           bilibili_go.WithLogger(log),
       )
-      client.LoginWithQrCode()
       ```
 
 
