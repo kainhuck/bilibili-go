@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -80,6 +81,8 @@ func (c *Client) getWbiKeyCached() string {
 
 	return c.wbiKey
 }
+
+/* ================= 一下是对接口的二次封装 ================= */
 
 // LoginWithQrCode 登陆这一步必须成功，否则后续接口无法访问
 func (c *Client) LoginWithQrCode() {
@@ -313,6 +316,51 @@ func (c *Client) GetMyInfo() (*GetMyInfoResponse, error) {
 	_ = c.authStorage.SaveAuthInfo(c.authInfo)
 
 	return user, nil
+}
+
+// Follow 关注用户
+func (c *Client) Follow(mid string) error {
+	return c.ModifyRelation(mid, 1, 11)
+}
+
+// UnFollow 取关用户
+func (c *Client) UnFollow(mid string) error {
+	return c.ModifyRelation(mid, 2, 11)
+}
+
+// WhisperFollow 悄悄关注
+func (c *Client) WhisperFollow(mid string) error {
+	return c.ModifyRelation(mid, 3, 11)
+}
+
+// UnWhisperFollow 取消悄悄关注
+func (c *Client) UnWhisperFollow(mid string) error {
+	return c.ModifyRelation(mid, 4, 11)
+}
+
+// Block 拉黑用户
+func (c *Client) Block(mid string) error {
+	return c.ModifyRelation(mid, 5, 11)
+}
+
+// UnBlock 取消拉黑
+func (c *Client) UnBlock(mid string) error {
+	return c.ModifyRelation(mid, 6, 11)
+}
+
+// GetFollowers 查询自己的粉丝
+func (c *Client) GetFollowers(ps int, pn int) (*RelationUserResponse, error) {
+	return c.GetUserFollowers(strconv.Itoa(c.authInfo.User.Mid), ps, pn)
+}
+
+// GetFollowings 查询自己的关注
+func (c *Client) GetFollowings(orderType string, ps int, pn int) (*RelationUserResponse, error) {
+	return c.GetUserFollowings(strconv.Itoa(c.authInfo.User.Mid), orderType, ps, pn)
+}
+
+// GetFollowingsV2 查询自己的关注
+func (c *Client) GetFollowingsV2(ps int, pn int) (*RelationUserResponse, error) {
+	return c.GetUserFollowingsV2(strconv.Itoa(c.authInfo.User.Mid), ps, pn)
 }
 
 /* ===================== helper ===================== */

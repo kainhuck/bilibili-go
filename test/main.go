@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	bilibili_go "github.com/kainhuck/bilibili-go"
 	"log"
+	"strconv"
 )
 
 func main() {
@@ -13,11 +15,11 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	_, err := client.BatchModifyRelation([]string{"3", "4"}, 1, 11)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("success")
+	printIt(client.GetFriends())
+	printIt(client.GetRelationTags())
+	printIt(client.GetRelationTagUsers(-10, "", 1, 1))
+
+	//RelationDemo(client)
 
 	//SearchUserInfo(client)
 
@@ -76,4 +78,39 @@ func SearchUserInfo(client *bilibili_go.Client) {
 		log.Fatal(err)
 	}
 	fmt.Printf("用户名：%v，粉丝数：%v，硬币数：%v\n", resp.Name, resp.Follower, resp.Coins)
+}
+
+// RelationDemo 关系操作
+func RelationDemo(client *bilibili_go.Client) {
+	// 1. 查询自己的所有粉丝
+	pn := 0
+	for {
+		pn++
+		resp, err := client.GetFollowers(50, pn)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if len(resp.List) == 0 {
+			break
+		}
+
+		for _, each := range resp.List {
+			// 查询粉丝详细信息
+			user, err := client.GetUserCard(strconv.Itoa(each.Mid), true)
+			if err != nil {
+				log.Println(each.Uname, err)
+				continue
+			}
+			fmt.Printf("名字: %v\tmid: %v\t性别: %v\t粉丝数: %v\t等级: %v\n", user.Card.Name, user.Card.Mid, user.Card.Sex, user.Card.Fans, user.Card.LevelInfo.CurrentLevel)
+		}
+	}
+}
+
+func printIt(a any, err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+	bts, _ := json.MarshalIndent(a, "", "  ")
+	fmt.Println(string(bts))
 }

@@ -7,9 +7,26 @@ import (
 	"strings"
 )
 
+type Code int
+
+const (
+	// CodeSuccess 成功
+	CodeSuccess Code = 0
+	// CodeCsrfFailed csrf校验失败
+	CodeCsrfFailed Code = -111
+	// CodeUnLogin 账号未登录
+	CodeUnLogin Code = -101
+	// CodeRequestError 请求错误
+	CodeRequestError Code = -400
+	// CodePermissionDenied 没有权限
+	CodePermissionDenied Code = 22104
+	// CodeUnFollowed 未关注
+	CodeUnFollowed Code = 22105
+)
+
 // BaseResponse dor base response
 type BaseResponse struct {
-	Code    int         `json:"code"`
+	Code    Code        `json:"code"`
 	Message string      `json:"message"`
 	TTL     int         `json:"ttl"`
 	Data    interface{} `json:"data"`
@@ -654,4 +671,45 @@ type RelationUser struct {
 // BatchModifyRelationResponse 批量操作关系
 type BatchModifyRelationResponse struct {
 	FailedFids []string `json:"failed_fids"` // 操作失败的 mid 列表
+}
+
+type Attribute int
+
+const (
+	// UnFollowed 未关注
+	UnFollowed Attribute = 0
+	// Followed 已关注
+	Followed Attribute = 2
+	// FollowEachOther 已互粉
+	FollowEachOther Attribute = 6
+	// InBlacklist 已拉黑
+	InBlacklist Attribute = 128
+)
+
+// Relation 关系
+type Relation struct {
+	Mid       int       `json:"mid"`
+	Attribute Attribute `json:"attribute"`
+	MTime     int64     `json:"mtime"` // 关注对方时间
+	Tag       []int     `json:"tag"`
+	Special   int       `json:"special"` // 1 特别关注
+}
+
+// AccRelation 相互关系
+type AccRelation struct {
+	Relation   Relation `json:"relation"`
+	BeRelation Relation `json:"be_relation"`
+}
+
+// RelationTag 分组标签
+type RelationTag struct {
+	TagId int    `json:"tagid"` // 0 默认分组 -10 特别关注
+	Name  string `json:"name"`  // 分组名称
+	Count int    `json:"count"` // 分组成员数
+	Tip   string `json:"tip"`   // 提示信息
+}
+
+// CreateRelationTagResponse 创建分组
+type CreateRelationTagResponse struct {
+	TagId int `json:"tagid"`
 }
