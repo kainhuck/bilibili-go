@@ -61,7 +61,8 @@ func (c *Client) GetAccount() (*AccountResponse, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &AccountResponse{}
@@ -80,7 +81,8 @@ func (c *Client) GetNavigation() (*NavigationResponse, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &NavigationResponse{}
@@ -99,7 +101,8 @@ func (c *Client) GetNavigationStatus() (*NavigationStatusResponse, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &NavigationStatusResponse{}
@@ -210,7 +213,8 @@ func (c *Client) UploadCover(imageData []byte) (*UploadCoverResponse, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &UploadCoverResponse{}
@@ -244,7 +248,8 @@ func (c *Client) SubmitVideo(req *SubmitRequest) (*SubmitResponse, error) {
 	}
 
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &SubmitResponse{}
@@ -263,7 +268,8 @@ func (c *Client) GetCoin() (*GetCoinResponse, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &GetCoinResponse{}
@@ -285,7 +291,8 @@ func (c *Client) GetUserInfo(mid string) (*GetUserInfoResponse, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &GetUserInfoResponse{}
@@ -310,7 +317,8 @@ func (c *Client) GetUserCard(mid string, photo bool) (*GetUserCardResponse, erro
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &GetUserCardResponse{}
@@ -329,7 +337,8 @@ func (c *Client) getMyInfo() (*GetMyInfoResponse, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &GetMyInfoResponse{}
@@ -350,7 +359,8 @@ func (c *Client) GetRelationStat(mid string) (*GetRelationStatResponse, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &GetRelationStatResponse{}
@@ -371,7 +381,8 @@ func (c *Client) GetUpStat(mid string) (*GetUpStatResponse, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &GetUpStatResponse{}
@@ -392,7 +403,8 @@ func (c *Client) GetDocUploadCount(mid string) (*GetDocUploadCountResponse, erro
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &GetDocUploadCountResponse{}
@@ -419,7 +431,8 @@ func (c *Client) GetUserFollowers(mid string, ps int, pn int) (*RelationUserResp
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &RelationUserResponse{}
@@ -448,7 +461,8 @@ func (c *Client) GetUserFollowings(mid string, orderType string, ps int, pn int)
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &RelationUserResponse{}
@@ -475,7 +489,8 @@ func (c *Client) GetUserFollowingsV2(mid string, ps int, pn int) (*RelationUserR
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &RelationUserResponse{}
@@ -503,7 +518,8 @@ func (c *Client) SearchUserFollowings(mid string, name string, ps int, pn int) (
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &RelationUserResponse{}
@@ -529,7 +545,8 @@ func (c *Client) GetSameFollowings(mid string, ps int, pn int) (*RelationUserRes
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &RelationUserResponse{}
@@ -553,7 +570,8 @@ func (c *Client) GetWhispers() (*RelationUserResponse, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &RelationUserResponse{}
@@ -577,7 +595,8 @@ func (c *Client) GetFriends() (*RelationUserResponse, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &RelationUserResponse{}
@@ -601,7 +620,8 @@ func (c *Client) GetBlacks(ps int, pn int) (*RelationUserResponse, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &RelationUserResponse{}
@@ -643,7 +663,8 @@ func (c *Client) ModifyRelation(mid string, act int, reSrc int) error {
 		return err
 	}
 	if baseResp.Code != 0 {
-		return fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return fmt.Errorf("%s", bts)
 	}
 
 	return nil
@@ -676,7 +697,8 @@ func (c *Client) BatchModifyRelation(mids []string, act int, reSrc int) (*BatchM
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &BatchModifyRelationResponse{}
@@ -698,7 +720,8 @@ func (c *Client) GetRelation(mid string) (*Relation, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &Relation{}
@@ -720,7 +743,8 @@ func (c *Client) GetAccRelation(mid string) (*AccRelation, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := &AccRelation{}
@@ -742,10 +766,32 @@ func (c *Client) BatchGetRelation(mid ...string) (map[string]Relation, error) {
 		return nil, err
 	}
 	if baseResp.Code != 0 {
-		return nil, fmt.Errorf(baseResp.Message)
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
 	}
 
 	rsp := make(map[string]Relation)
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetRelationTags 查询关注分组列表 https://api.bilibili.com/x/relation/tags
+func (c *Client) GetRelationTags() ([]*RelationTag, error) {
+	uri := "https://api.bilibili.com/x/relation/tags"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != 0 {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := make([]*RelationTag, 0)
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
 	return rsp, err

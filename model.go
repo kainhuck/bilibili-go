@@ -683,3 +683,11 @@ type AccRelation struct {
 	Relation   Relation `json:"relation"`
 	BeRelation Relation `json:"be_relation"`
 }
+
+// RelationTag 分组标签
+type RelationTag struct {
+	TagId int    `json:"tagid"` // 0 默认分组 -10 特别关注
+	Name  string `json:"name"`  // 分组名称
+	Count int    `json:"count"` // 分组成员数
+	Tip   string `json:"tip"`   // 提示信息
+}
