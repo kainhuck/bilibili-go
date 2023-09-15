@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -368,17 +367,17 @@ func (c *Client) UnBlock(mid string) error {
 
 // GetFollowers 查询自己的粉丝
 func (c *Client) GetFollowers(ps int, pn int) (*RelationUserResponse, error) {
-	return c.GetUserFollowers(strconv.Itoa(c.authInfo.User.Mid), ps, pn)
+	return c.GetUserFollowers(c.authInfo.User.Mid, ps, pn)
 }
 
 // GetFollowings 查询自己的关注
 func (c *Client) GetFollowings(orderType string, ps int, pn int) (*RelationUserResponse, error) {
-	return c.GetUserFollowings(strconv.Itoa(c.authInfo.User.Mid), orderType, ps, pn)
+	return c.GetUserFollowings(c.authInfo.User.Mid, orderType, ps, pn)
 }
 
 // GetFollowingsV2 查询自己的关注
 func (c *Client) GetFollowingsV2(ps int, pn int) (*RelationUserResponse, error) {
-	return c.GetUserFollowingsV2(strconv.Itoa(c.authInfo.User.Mid), ps, pn)
+	return c.GetUserFollowingsV2(c.authInfo.User.Mid, ps, pn)
 }
 
 /* ===================== helper ===================== */

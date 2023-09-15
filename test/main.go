@@ -5,18 +5,21 @@ import (
 	"fmt"
 	bilibili_go "github.com/kainhuck/bilibili-go"
 	"log"
-	"strconv"
 )
 
 func main() {
 	client := bilibili_go.NewClient(
 		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.json")),
-		bilibili_go.WithDebug(true),
+		bilibili_go.WithDebug(false),
 	)
 	client.LoginWithQrCode()
-	defer client.Logout()
 
-	printIt(client.GetFriends())
+	myself, err := client.GetMyInfo(false)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	printIt(client.GetDeliveryList(myself.Mid, "", 0, "", 1, 10))
 	//printIt(client.GetRelationTags())
 	//printIt(client.GetRelationTagUsers(-10, "", 1, 1))
 
@@ -98,7 +101,7 @@ func RelationDemo(client *bilibili_go.Client) {
 
 		for _, each := range resp.List {
 			// 查询粉丝详细信息
-			user, err := client.GetUserCard(strconv.Itoa(each.Mid), true)
+			user, err := client.GetUserCard(each.Mid, true)
 			if err != nil {
 				log.Println(each.Uname, err)
 				continue

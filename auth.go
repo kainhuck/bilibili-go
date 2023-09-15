@@ -58,7 +58,7 @@ func (f fileAuthStorage) SaveAuthInfo(info *AuthInfo) error {
 }
 
 func (f fileAuthStorage) LogoutAuthInfo(*AuthInfo) error {
-	return nil
+	return os.Remove(f.file)
 }
 
 func NewFileAuthStorage(file string) AuthStorage {
