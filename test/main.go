@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	bilibili_go "github.com/kainhuck/bilibili-go"
+	"github.com/skip2/go-qrcode"
 	"log"
 )
 
@@ -11,15 +12,22 @@ func main() {
 	client := bilibili_go.NewClient(
 		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.json")),
 		bilibili_go.WithDebug(false),
+		bilibili_go.WithShowQRCodeFunc(func(code *qrcode.QRCode) error {
+
+			return code.WriteFile(640, "qrcode.png")
+		}),
 	)
 	client.LoginWithQrCode()
 
-	myself, err := client.GetMyInfo(false)
-	if err != nil {
-		log.Fatal(err)
-	}
+	printIt(client.GetMyInfo(false))
 
-	printIt(client.GetDeliveryList(myself.Mid, "", 0, "", 1, 10))
+	//printIt(client.GetFriends())
+
+	//myself, err := client.GetMyInfo(false)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+
 	//printIt(client.GetRelationTags())
 	//printIt(client.GetRelationTagUsers(-10, "", 1, 1))
 
@@ -51,7 +59,7 @@ func SubmitVideo(client *bilibili_go.Client) {
 		Cover:     cover.Url,
 		Title:     "一起去郊游吧",
 		Copyright: 1,
-		TID:       bilibili_go.LifeGroup.MainTid(),
+		TID:       bilibili_go.LifeGroup.RandomTid(),
 		Tag:       "郊游",
 		Desc:      "我们一起去郊游吧",
 		Recreate:  -1,
@@ -101,12 +109,12 @@ func RelationDemo(client *bilibili_go.Client) {
 
 		for _, each := range resp.List {
 			// 查询粉丝详细信息
-			user, err := client.GetUserCard(each.Mid, true)
+			user, err := client.GetUserInfo(each.Mid)
 			if err != nil {
 				log.Println(each.Uname, err)
 				continue
 			}
-			fmt.Printf("名字: %v\tmid: %v\t性别: %v\t粉丝数: %v\t等级: %v\n", user.Card.Name, user.Card.Mid, user.Card.Sex, user.Card.Fans, user.Card.LevelInfo.CurrentLevel)
+			fmt.Printf("名字: %v\tmid: %v\t性别: %v\t学校: %v\t等级: %v\n", user.Name, user.Mid, user.Sex, user.School.Name, user.Level)
 		}
 	}
 }

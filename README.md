@@ -42,7 +42,7 @@
           bilibili_go.WithHttpClient(&http.Client{
               Transport: &http.Transport{
                   Proxy: http.ProxyURL(proxyURL),
-              }
+              },
           }),
       )
       ```

@@ -718,7 +718,3 @@ type CreateRelationTagResponse struct {
 type LogoutResponse struct {
 	RedirectUrl string `json:"redirectUrl"`
 }
-
-// GetDeliveryListResponse 投稿列表 todo
-type GetDeliveryListResponse struct {
-}
