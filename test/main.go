@@ -4,20 +4,32 @@ import (
 	"encoding/json"
 	"fmt"
 	bilibili_go "github.com/kainhuck/bilibili-go"
+	"github.com/skip2/go-qrcode"
 	"log"
-	"strconv"
 )
 
 func main() {
 	client := bilibili_go.NewClient(
 		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.json")),
-		bilibili_go.WithDebug(true),
+		bilibili_go.WithDebug(false),
+		bilibili_go.WithShowQRCodeFunc(func(code *qrcode.QRCode) error {
+
+			return code.WriteFile(640, "qrcode.png")
+		}),
 	)
 	client.LoginWithQrCode()
 
-	printIt(client.GetFriends())
-	printIt(client.GetRelationTags())
-	printIt(client.GetRelationTagUsers(-10, "", 1, 1))
+	printIt(client.GetMyInfo(false))
+
+	//printIt(client.GetFriends())
+
+	//myself, err := client.GetMyInfo(false)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+
+	//printIt(client.GetRelationTags())
+	//printIt(client.GetRelationTagUsers(-10, "", 1, 1))
 
 	//RelationDemo(client)
 
@@ -47,7 +59,7 @@ func SubmitVideo(client *bilibili_go.Client) {
 		Cover:     cover.Url,
 		Title:     "一起去郊游吧",
 		Copyright: 1,
-		TID:       bilibili_go.LifeGroup.MainTid(),
+		TID:       bilibili_go.LifeGroup.RandomTid(),
 		Tag:       "郊游",
 		Desc:      "我们一起去郊游吧",
 		Recreate:  -1,
@@ -73,7 +85,7 @@ func SearchUserInfo(client *bilibili_go.Client) {
 	fmt.Printf("用户名：%v，粉丝数：%v，头衔：%v\n", card.Card.Name, card.Card.Fans, card.Card.Official.Title)
 
 	// 2. 查询自身信息
-	resp, err := client.GetMyInfo()
+	resp, err := client.GetMyInfo(false)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -97,12 +109,12 @@ func RelationDemo(client *bilibili_go.Client) {
 
 		for _, each := range resp.List {
 			// 查询粉丝详细信息
-			user, err := client.GetUserCard(strconv.Itoa(each.Mid), true)
+			user, err := client.GetUserInfo(each.Mid)
 			if err != nil {
 				log.Println(each.Uname, err)
 				continue
 			}
-			fmt.Printf("名字: %v\tmid: %v\t性别: %v\t粉丝数: %v\t等级: %v\n", user.Card.Name, user.Card.Mid, user.Card.Sex, user.Card.Fans, user.Card.LevelInfo.CurrentLevel)
+			fmt.Printf("名字: %v\tmid: %v\t性别: %v\t学校: %v\t等级: %v\n", user.Name, user.Mid, user.Sex, user.School.Name, user.Level)
 		}
 	}
 }

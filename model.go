@@ -94,7 +94,7 @@ type NavigationResponse struct {
 		CurrentMin   int `json:"current_min"`
 		NextExp      int `json:"next_exp"`
 	} `json:"level_info"` // 等级信息
-	Mid            int     `json:"mid"`             // 用户 mid
+	Mid            int64   `json:"mid"`             // 用户 mid
 	MobileVerified int     `json:"mobile_verified"` // 是否验证手机号 0 未验证 1 已验证
 	Money          float64 `json:"money"`           // 硬币数
 	Moral          int     `json:"moral"`           // 当前节操值 上限70
@@ -169,10 +169,10 @@ type NavigationResponse struct {
 	VIPPayType       int    `json:"vip_pay_type"`       // 会员开通状态 0 无 1 有
 	VIPThemeType     int    `json:"vip_theme_type"`     // ？
 	Wallet           struct {
-		BCoinBalance  int `json:"bcoin_balance"`
-		CouponBalance int `json:"coupon_balance"`
-		CouponDueTime int `json:"coupon_due_time"`
-		Mid           int `json:"mid"`
+		BCoinBalance  int   `json:"bcoin_balance"`
+		CouponBalance int   `json:"coupon_balance"`
+		CouponDueTime int   `json:"coupon_due_time"`
+		Mid           int64 `json:"mid"`
 	} `json:"wallet"` // B币钱包信息
 	WBIImg struct {
 		ImgURL string `json:"img_url"`
@@ -283,7 +283,7 @@ type GetCoinResponse struct {
 
 // GetUserInfoResponse 用户空间信息
 type GetUserInfoResponse struct {
-	Mid         int      `json:"mid"`           // mid
+	Mid         int64    `json:"mid"`           // mid
 	Name        string   `json:"name"`          // 昵称
 	Sex         string   `json:"sex"`           // 性别 男 女 保密
 	Face        string   `json:"face"`          // 头像链接
@@ -353,7 +353,7 @@ type GetUserInfoResponse struct {
 		Condition  string `json:"condition"`
 	} `json:"nameplate"`
 	UserHonourInfo struct { // ？
-		Mid    int      `json:"mid"`
+		Mid    int64    `json:"mid"`
 		Colour []string `json:"colour"`
 		Tags   []string `json:"tags"`
 	} `json:"user_honour_info"`
@@ -515,7 +515,7 @@ type GetUserCardResponse struct {
 
 // GetMyInfoResponse 登陆用户个人详细信息
 type GetMyInfoResponse struct {
-	Mid            int    `json:"mid"`             // mid
+	Mid            int64  `json:"mid"`             // mid
 	Name           string `json:"name"`            // 昵称
 	Sex            string `json:"sex"`             // 性别 男 女 保密
 	Face           string `json:"face"`            // 头像图片url
@@ -551,7 +551,7 @@ type GetMyInfoResponse struct {
 	FaceNftNew     int `json:"face_nft_new"`
 	IsSeniorMember int `json:"is_senior_member"`
 	Honours        struct {
-		Mid    int `json:"mid"`
+		Mid    int64 `json:"mid"`
 		Colour struct {
 			Dark   string `json:"dark"`
 			Normal string `json:"normal"`
@@ -590,11 +590,11 @@ type GetMyInfoResponse struct {
 
 // GetRelationStatResponse 用户关系状态
 type GetRelationStatResponse struct {
-	Mid       int `json:"mid"`
-	Following int `json:"following"` // 关注数
-	Whisper   int `json:"whisper"`   // 悄悄关注数 需要登陆
-	Black     int `json:"black"`     // 黑名单数 需要登陆
-	Follower  int `json:"follower"`  // 粉丝数
+	Mid       int64 `json:"mid"`
+	Following int   `json:"following"` // 关注数
+	Whisper   int   `json:"whisper"`   // 悄悄关注数 需要登陆
+	Black     int   `json:"black"`     // 黑名单数 需要登陆
+	Follower  int   `json:"follower"`  // 粉丝数
 }
 
 // GetUpStatResponse up主状态
@@ -626,7 +626,7 @@ type RelationUserResponse struct {
 }
 
 type RelationUser struct {
-	Mid            int      `json:"mid"`
+	Mid            int64    `json:"mid"`
 	Attribute      int      `json:"attribute"`     // 0 未关注 1 已关注 2 已关注 6 已互粉 128 已拉黑
 	Mtime          int      `json:"mtime"`         // 关注对方时间
 	Tag            []int    `json:"tag"`           // 分组ID
@@ -688,7 +688,7 @@ const (
 
 // Relation 关系
 type Relation struct {
-	Mid       int       `json:"mid"`
+	Mid       int64     `json:"mid"`
 	Attribute Attribute `json:"attribute"`
 	MTime     int64     `json:"mtime"` // 关注对方时间
 	Tag       []int     `json:"tag"`
@@ -712,4 +712,9 @@ type RelationTag struct {
 // CreateRelationTagResponse 创建分组
 type CreateRelationTagResponse struct {
 	TagId int `json:"tagid"`
+}
+
+// LogoutResponse 登出
+type LogoutResponse struct {
+	RedirectUrl string `json:"redirectUrl"`
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/spf13/cast"
 	"net/http"
 	"strconv"
 	"strings"
@@ -287,13 +288,13 @@ func (c *Client) GetCoin() (*GetCoinResponse, error) {
 }
 
 // GetUserInfo 用户空间详细信息 https://api.bilibili.com/x/space/wbi/acc/info
-func (c *Client) GetUserInfo(mid string) (*GetUserInfoResponse, error) {
+func (c *Client) GetUserInfo(mid interface{}) (*GetUserInfoResponse, error) {
 	uri := "https://api.bilibili.com/x/space/wbi/acc/info"
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Get(uri).
 		SetWbiKey(c.getWbiKeyCached()).
-		AddParams("mid", mid).
+		AddParams("mid", cast.ToString(mid)).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -313,12 +314,12 @@ func (c *Client) GetUserInfo(mid string) (*GetUserInfoResponse, error) {
 //
 //	mid 用户mid
 //	photo 是否请求用户主页头像
-func (c *Client) GetUserCard(mid string, photo bool) (*GetUserCardResponse, error) {
+func (c *Client) GetUserCard(mid interface{}, photo bool) (*GetUserCardResponse, error) {
 	uri := "https://api.bilibili.com/x/web-interface/card"
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Get(uri).
-		AddParams("mid", mid).
+		AddParams("mid", cast.ToString(mid)).
 		AddParams("photo", strconv.FormatBool(photo)).
 		EndStruct(&baseResp)
 	if err != nil {
@@ -356,12 +357,12 @@ func (c *Client) getMyInfo() (*GetMyInfoResponse, error) {
 }
 
 // GetRelationStat 获取用户关系状态 https://api.bilibili.com/x/relation/stat
-func (c *Client) GetRelationStat(mid string) (*GetRelationStatResponse, error) {
+func (c *Client) GetRelationStat(mid interface{}) (*GetRelationStatResponse, error) {
 	uri := "https://api.bilibili.com/x/relation/stat"
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Get(uri).
-		AddParams("vmid", mid).
+		AddParams("vmid", cast.ToString(mid)).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -378,12 +379,12 @@ func (c *Client) GetRelationStat(mid string) (*GetRelationStatResponse, error) {
 }
 
 // GetUpStat 获取up主状态数 https://api.bilibili.com/x/space/upstat
-func (c *Client) GetUpStat(mid string) (*GetUpStatResponse, error) {
+func (c *Client) GetUpStat(mid interface{}) (*GetUpStatResponse, error) {
 	uri := "https://api.bilibili.com/x/space/upstat"
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Get(uri).
-		AddParams("mid", mid).
+		AddParams("mid", cast.ToString(mid)).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -400,12 +401,12 @@ func (c *Client) GetUpStat(mid string) (*GetUpStatResponse, error) {
 }
 
 // GetDocUploadCount 相簿投稿数 https://api.vc.bilibili.com/link_draw/v1/doc/upload_count
-func (c *Client) GetDocUploadCount(mid string) (*GetDocUploadCountResponse, error) {
+func (c *Client) GetDocUploadCount(mid interface{}) (*GetDocUploadCountResponse, error) {
 	uri := "https://api.vc.bilibili.com/link_draw/v1/doc/upload_count"
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(false).Get(uri).
-		AddParams("uid", mid).
+		AddParams("uid", cast.ToString(mid)).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -426,12 +427,12 @@ func (c *Client) GetDocUploadCount(mid string) (*GetDocUploadCountResponse, erro
 // ps 每页大小
 // pn 页码
 // 注意：查询别的用户粉丝数上限为250
-func (c *Client) GetUserFollowers(mid string, ps int, pn int) (*RelationUserResponse, error) {
+func (c *Client) GetUserFollowers(mid interface{}, ps int, pn int) (*RelationUserResponse, error) {
 	uri := "https://api.bilibili.com/x/relation/followers"
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Get(uri).
-		AddParams("vmid", mid).
+		AddParams("vmid", cast.ToString(mid)).
 		AddParams("ps", strconv.Itoa(ps)).
 		AddParams("pn", strconv.Itoa(pn)).
 		EndStruct(&baseResp)
@@ -455,12 +456,12 @@ func (c *Client) GetUserFollowers(mid string, ps int, pn int) (*RelationUserResp
 // ps 每页大小
 // pn 页码
 // 注意：查询别的用户关注数上限为250
-func (c *Client) GetUserFollowings(mid string, orderType string, ps int, pn int) (*RelationUserResponse, error) {
+func (c *Client) GetUserFollowings(mid interface{}, orderType string, ps int, pn int) (*RelationUserResponse, error) {
 	uri := "https://api.bilibili.com/x/relation/followings"
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Get(uri).
-		AddParams("vmid", mid).
+		AddParams("vmid", cast.ToString(mid)).
 		AddParams("order_type", orderType).
 		AddParams("ps", strconv.Itoa(ps)).
 		AddParams("pn", strconv.Itoa(pn)).
@@ -484,12 +485,12 @@ func (c *Client) GetUserFollowings(mid string, orderType string, ps int, pn int)
 // ps 每页大小
 // pn 页码
 // 注意：仅可查看前 5 页 可以获取已设置可见性隐私的关注列表
-func (c *Client) GetUserFollowingsV2(mid string, ps int, pn int) (*RelationUserResponse, error) {
+func (c *Client) GetUserFollowingsV2(mid interface{}, ps int, pn int) (*RelationUserResponse, error) {
 	uri := "https://app.biliapi.net/x/v2/relation/followings"
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Get(uri).
-		AddParams("vmid", mid).
+		AddParams("vmid", cast.ToString(mid)).
 		AddParams("ps", strconv.Itoa(ps)).
 		AddParams("pn", strconv.Itoa(pn)).
 		EndStruct(&baseResp)
@@ -512,12 +513,12 @@ func (c *Client) GetUserFollowingsV2(mid string, ps int, pn int) (*RelationUserR
 // name 搜索关键词
 // ps 每页大小
 // pn 页码
-func (c *Client) SearchUserFollowings(mid string, name string, ps int, pn int) (*RelationUserResponse, error) {
+func (c *Client) SearchUserFollowings(mid interface{}, name string, ps int, pn int) (*RelationUserResponse, error) {
 	uri := "https://api.bilibili.com/x/relation/followings/search"
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Get(uri).
-		AddParams("vmid", mid).
+		AddParams("vmid", cast.ToString(mid)).
 		AddParams("name", name).
 		AddParams("ps", strconv.Itoa(ps)).
 		AddParams("pn", strconv.Itoa(pn)).
@@ -540,12 +541,12 @@ func (c *Client) SearchUserFollowings(mid string, name string, ps int, pn int) (
 // mid 目标用户ID
 // ps 每页大小
 // pn 页码
-func (c *Client) GetSameFollowings(mid string, ps int, pn int) (*RelationUserResponse, error) {
+func (c *Client) GetSameFollowings(mid interface{}, ps int, pn int) (*RelationUserResponse, error) {
 	uri := "https://api.bilibili.com/x/relation/same/followings"
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Get(uri).
-		AddParams("vmid", mid).
+		AddParams("vmid", cast.ToString(mid)).
 		AddParams("ps", strconv.Itoa(ps)).
 		AddParams("pn", strconv.Itoa(pn)).
 		EndStruct(&baseResp)
@@ -656,13 +657,13 @@ func (c *Client) GetBlacks(ps int, pn int) (*RelationUserResponse, error) {
 //	14 视频
 //	115 文章
 //	222 活动页面
-func (c *Client) ModifyRelation(mid string, act int, reSrc int) error {
+func (c *Client) ModifyRelation(mid interface{}, act int, reSrc int) error {
 	uri := "https://api.bilibili.com/x/relation/modify"
 
 	var baseResp BaseResponse
 
 	err := c.getHttpClient(true).Post(uri).
-		AddFormData("fid", mid).
+		AddFormData("fid", cast.ToString(mid)).
 		AddFormData("act", strconv.Itoa(act)).
 		AddFormData("re_src", strconv.Itoa(reSrc)).
 		AddFormData("csrf", c.cookieCache["bili_jct"]).
@@ -717,12 +718,12 @@ func (c *Client) BatchModifyRelation(mids []string, act int, reSrc int) (*BatchM
 
 // GetRelation 查询用户与自己的关系 https://api.bilibili.com/x/relation
 // mid 用户ID
-func (c *Client) GetRelation(mid string) (*Relation, error) {
+func (c *Client) GetRelation(mid interface{}) (*Relation, error) {
 	uri := "https://api.bilibili.com/x/relation"
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Get(uri).
-		AddParams("fid", mid).
+		AddParams("fid", cast.ToString(mid)).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -739,12 +740,12 @@ func (c *Client) GetRelation(mid string) (*Relation, error) {
 }
 
 // GetAccRelation 查询用户与自己的互相关系 https://api.bilibili.com/x/space/wbi/acc/relation
-func (c *Client) GetAccRelation(mid string) (*AccRelation, error) {
+func (c *Client) GetAccRelation(mid interface{}) (*AccRelation, error) {
 	uri := "https://api.bilibili.com/x/space/wbi/acc/relation"
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Get(uri).
-		AddParams("mid", mid).
+		AddParams("mid", cast.ToString(mid)).
 		SetWbiKey(c.getWbiKeyCached()).
 		EndStruct(&baseResp)
 	if err != nil {
@@ -837,12 +838,12 @@ func (c *Client) GetRelationTagUsers(tagId int, orderType string, ps int, pn int
 // QueryRelationTagByUser 查询用户所在的分组 https://api.bilibili.com/x/relation/tag/user
 // mid 用户ID
 // 返回的 key 是分组ID， value 是分组名称
-func (c *Client) QueryRelationTagByUser(mid string) (map[string]string, error) {
+func (c *Client) QueryRelationTagByUser(mid interface{}) (map[string]string, error) {
 	uri := "https://api.bilibili.com/x/relation/tag/user"
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Get(uri).
-		AddParams("fid", mid).
+		AddParams("fid", cast.ToString(mid)).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -1042,4 +1043,26 @@ func (c *Client) MoveUsersToRelationTags(mids []string, beforeTagIds []int, afte
 	}
 
 	return nil
+}
+
+// logout 退出登陆 https://passport.bilibili.com/login/exit/v2
+func (c *Client) logout() (*LogoutResponse, error) {
+	uri := "https://passport.bilibili.com/login/exit/v2"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("biliCSRF", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &LogoutResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
 }

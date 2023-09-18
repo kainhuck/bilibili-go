@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -163,6 +162,24 @@ func (c *Client) LoginWithQrCode() {
 	}
 }
 
+// Logout 退出登陆 会返回重定向链接
+func (c *Client) Logout() (string, error) {
+	resp, err := c.logout()
+	if err != nil {
+		return "", err
+	}
+
+	if c.authStorage != nil {
+		if err := c.authStorage.LogoutAuthInfo(c.authInfo); err != nil {
+			c.logger.Errorf("call LogoutAuthInfo failed: %v", err)
+		}
+	}
+
+	c.authInfo = nil
+
+	return resp.RedirectUrl, nil
+}
+
 // UploadVideoFromDisk 从本地磁盘上传视频 videoPath 视频路径
 func (c *Client) UploadVideoFromDisk(videoPath string) (*Video, error) {
 	fileInfo, err := os.Stat(videoPath)
@@ -303,8 +320,8 @@ func (c *Client) UploadCoverFromHTTP(url string) (*UploadCoverResponse, error) {
 }
 
 // GetMyInfo 获取当前用户信息
-func (c *Client) GetMyInfo() (*GetMyInfoResponse, error) {
-	if c.authInfo.User != nil {
+func (c *Client) GetMyInfo(refresh bool) (*GetMyInfoResponse, error) {
+	if c.authInfo.User != nil && !refresh {
 		return c.authInfo.User, nil
 	}
 	user, err := c.getMyInfo()
@@ -319,48 +336,48 @@ func (c *Client) GetMyInfo() (*GetMyInfoResponse, error) {
 }
 
 // Follow 关注用户
-func (c *Client) Follow(mid string) error {
+func (c *Client) Follow(mid interface{}) error {
 	return c.ModifyRelation(mid, 1, 11)
 }
 
 // UnFollow 取关用户
-func (c *Client) UnFollow(mid string) error {
+func (c *Client) UnFollow(mid interface{}) error {
 	return c.ModifyRelation(mid, 2, 11)
 }
 
 // WhisperFollow 悄悄关注
-func (c *Client) WhisperFollow(mid string) error {
+func (c *Client) WhisperFollow(mid interface{}) error {
 	return c.ModifyRelation(mid, 3, 11)
 }
 
 // UnWhisperFollow 取消悄悄关注
-func (c *Client) UnWhisperFollow(mid string) error {
+func (c *Client) UnWhisperFollow(mid interface{}) error {
 	return c.ModifyRelation(mid, 4, 11)
 }
 
 // Block 拉黑用户
-func (c *Client) Block(mid string) error {
+func (c *Client) Block(mid interface{}) error {
 	return c.ModifyRelation(mid, 5, 11)
 }
 
 // UnBlock 取消拉黑
-func (c *Client) UnBlock(mid string) error {
+func (c *Client) UnBlock(mid interface{}) error {
 	return c.ModifyRelation(mid, 6, 11)
 }
 
 // GetFollowers 查询自己的粉丝
 func (c *Client) GetFollowers(ps int, pn int) (*RelationUserResponse, error) {
-	return c.GetUserFollowers(strconv.Itoa(c.authInfo.User.Mid), ps, pn)
+	return c.GetUserFollowers(c.authInfo.User.Mid, ps, pn)
 }
 
 // GetFollowings 查询自己的关注
 func (c *Client) GetFollowings(orderType string, ps int, pn int) (*RelationUserResponse, error) {
-	return c.GetUserFollowings(strconv.Itoa(c.authInfo.User.Mid), orderType, ps, pn)
+	return c.GetUserFollowings(c.authInfo.User.Mid, orderType, ps, pn)
 }
 
 // GetFollowingsV2 查询自己的关注
 func (c *Client) GetFollowingsV2(ps int, pn int) (*RelationUserResponse, error) {
-	return c.GetUserFollowingsV2(strconv.Itoa(c.authInfo.User.Mid), ps, pn)
+	return c.GetUserFollowingsV2(c.authInfo.User.Mid, ps, pn)
 }
 
 /* ===================== helper ===================== */
