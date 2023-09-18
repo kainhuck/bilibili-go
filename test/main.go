@@ -19,22 +19,27 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	printIt(client.GetMyInfo(false))
+	//printIt(client.GetMyInfo(false))
 
 	//printIt(client.GetFriends())
-
-	//myself, err := client.GetMyInfo(false)
+	//tags, err := client.GetRelationTags()
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
 
-	//printIt(client.GetRelationTags())
-	//printIt(client.GetRelationTagUsers(-10, "", 1, 1))
+	//for _, tag := range tags {
+	//	if tag.Count == 0 {
+	//		continue
+	//	}
+	//	pn := 1
+	//	for pn < tag.Count {
+	//		printIt(client.GetRelationTagUsers(tag.TagId, "", 1, pn))
+	//		pn++
+	//	}
+	//}
 
 	//RelationDemo(client)
-
 	//SearchUserInfo(client)
-
 	//SubmitVideo(client)
 }
 

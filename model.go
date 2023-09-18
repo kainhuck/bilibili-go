@@ -718,3 +718,9 @@ type CreateRelationTagResponse struct {
 type LogoutResponse struct {
 	RedirectUrl string `json:"redirectUrl"`
 }
+
+// CookieInfo ...
+type CookieInfo struct {
+	Refresh   bool  `json:"refresh"`
+	Timestamp int64 `json:"timestamp"`
+}

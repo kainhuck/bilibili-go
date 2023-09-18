@@ -1066,3 +1066,25 @@ func (c *Client) logout() (*LogoutResponse, error) {
 
 	return rsp, err
 }
+
+// getCookieInfo 检查是否需要刷新cookie https://passport.bilibili.com/x/passport-login/web/cookie/info
+func (c *Client) getCookieInfo() (*CookieInfo, error) {
+	uri := "https://passport.bilibili.com/x/passport-login/web/cookie/info"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("biliCSRF", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &CookieInfo{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
