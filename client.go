@@ -29,20 +29,38 @@ type Client struct {
 	logger           Logger
 	showQRCodeFunc   func(code *qrcode.QRCode) error
 	mid              int64 // 当前用户mid
+	intervalMutex    sync.Mutex
 }
 
 func NewClient(opts ...Option) *Client {
 	opt := applyOptions(opts...)
 
-	client := net.NewHttpClient(opt.HttpClient).SetUserAgent(opt.UserAgent)
+	httpClient := net.NewHttpClient(opt.HttpClient).SetUserAgent(opt.UserAgent)
 
-	return &Client{
-		httpClient:     client,
+	client := &Client{
+		httpClient:     httpClient,
 		authStorage:    opt.AuthStorage,
 		debug:          opt.Debug,
 		logger:         opt.Logger,
 		showQRCodeFunc: opt.ShowQRCodeFunc,
+		intervalMutex:  sync.Mutex{},
 	}
+
+	if opt.RefreshInterval > 0 {
+		go func() {
+			ticker := time.NewTicker(opt.RefreshInterval)
+			for {
+				select {
+				case <-ticker.C:
+					if err := client.RefreshAuthInfo(); err != nil {
+						client.logger.Errorf("refresh auth info failed: %v", err)
+					}
+				}
+			}
+		}()
+	}
+
+	return client
 }
 
 func (c *Client) setAuthInfo(auth *AuthInfo) {
@@ -364,6 +382,11 @@ func (c *Client) GetFollowingsV2(ps int, pn int) (*RelationUserResponse, error) 
 
 // RefreshAuthInfo 刷新token信息
 func (c *Client) RefreshAuthInfo() error {
+	if c.authInfo == nil {
+		return nil
+	}
+	c.intervalMutex.Lock()
+	defer c.intervalMutex.Unlock()
 	// 1. 判断是否需要刷新cookie
 	cookieInfo, err := c.getCookieInfo()
 	if err != nil {

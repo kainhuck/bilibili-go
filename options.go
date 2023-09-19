@@ -6,6 +6,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"net/http"
 	"os"
+	"time"
 )
 
 type options struct {
@@ -27,6 +28,9 @@ type options struct {
 	// ShowQRCodeFunc 自定义输出二维码的方法，默认在stdout输出，
 	// 可以通过自定义该方法可以实现其他输出，比如将图片发送到消息通知群
 	ShowQRCodeFunc func(code *qrcode.QRCode) error
+
+	// RefreshInterval cookie 刷新间隔单位秒 默认60s 设置为0则关闭定时刷新
+	RefreshInterval time.Duration
 }
 
 type Option interface {
@@ -108,6 +112,16 @@ func WithShowQRCodeFunc(f func(code *qrcode.QRCode) error) Option {
 	return showQRCodeFunc(f)
 }
 
+type refreshInterval time.Duration
+
+func (r refreshInterval) apply(opt *options) {
+	opt.RefreshInterval = time.Duration(r)
+}
+
+func WithRefreshInterval(interval time.Duration) Option {
+	return refreshInterval(interval)
+}
+
 /* ========================================================== */
 
 var defaultOptions = options{
@@ -120,6 +134,7 @@ var defaultOptions = options{
 
 		return err
 	},
+	RefreshInterval: time.Minute,
 }
 
 func applyOptions(opts ...Option) *options {

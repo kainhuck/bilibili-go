@@ -131,12 +131,24 @@
       )
       ```
 
+   7. 设置cookie刷新时间
+
+     默认1分种检查一次cookie是否需要刷新，如果设置为0则不检查刷新
+      ```go
+      client := bilibili_go.NewClient(
+          bilibili_go.WithRefreshInterval(time.Hour),
+      )
+      ```
+
 
 ## 特别鸣谢 🥰
 
 [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
 
 ## 更新日志 🐥
+
+### v0.3.6
+1. 新增token定期检查token刷新功能
 
 ### v0.3.5
 1. 新增token刷新功能
