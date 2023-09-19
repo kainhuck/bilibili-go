@@ -1427,3 +1427,31 @@ func (c *Client) GetVideoRank(tid int) ([]*Video, error) {
 
 	return rsp.List, nil
 }
+
+// GetLatestVideo 最新视频列表
+// pn 页码
+// ps 每页项数
+// tid 分区ID
+func (c *Client) GetLatestVideo(pn int, ps int, tid int) (*GetLatestVideoResponse, error) {
+	uri := "https://api.bilibili.com/x/web-interface/dynamic/region"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("pn", strconv.Itoa(pn)).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("rid", strconv.Itoa(tid)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &GetLatestVideoResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}

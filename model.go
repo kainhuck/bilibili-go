@@ -753,12 +753,6 @@ type TripleVideoResponse struct {
 	Multiply int  `json:"multiply"` // 投币数量
 }
 
-// GetPopularVideoListResponse ...
-type GetPopularVideoListResponse struct {
-	List   []*Video `json:"list"`
-	NoMore bool     `json:"no_more"`
-}
-
 type Video struct {
 	Aid         int         `json:"aid"`       // avid
 	Videos      int         `json:"videos"`    // 分P总数
@@ -789,7 +783,6 @@ type Video struct {
 	IsOgv       bool        `json:"is_ogv"`
 	OgvInfo     interface{} `json:"ogv_info"`
 	EnableVt    int         `json:"enable_vt"`
-	RcmdReason  *RcmdReason `json:"rcmd_reason"`
 }
 
 type DescV2 struct {
@@ -843,11 +836,6 @@ type Dimension struct {
 	Rotate int `json:"rotate"` // 是否将宽高对换 0 正常 1 对换
 }
 
-type RcmdReason struct {
-	Content    string `json:"content"`
-	CornerMark int    `json:"corner_mark"`
-}
-
 type Page struct {
 	Cid       int64      `json:"cid"`       // 分p cid
 	Page      int        `json:"page"`      // 分p序号
@@ -857,4 +845,20 @@ type Page struct {
 	Vid       string     `json:"vid"`       // 站外视频vid
 	Weblink   string     `json:"weblink"`   // 站外视频跳转url
 	Dimension *Dimension `json:"dimension"` // 当前分P分辨率
+}
+
+// GetPopularVideoListResponse ...
+type GetPopularVideoListResponse struct {
+	List   []*Video `json:"list"`
+	NoMore bool     `json:"no_more"`
+}
+
+// GetLatestVideoResponse ...
+type GetLatestVideoResponse struct {
+	Archives []*Video `json:"archives"`
+	Page     struct {
+		Count int `json:"count"` // 总数
+		Num   int `json:"num"`   // 当前页码
+		Size  int `json:"size"`  // 每页项数
+	} `json:"page"`
 }
