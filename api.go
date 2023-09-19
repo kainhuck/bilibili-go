@@ -1185,3 +1185,33 @@ func (c *Client) GetExpReword() (*ExpReward, error) {
 
 	return rsp, err
 }
+
+// AddCoins 视频投币
+// id 视频ID av号或者bv号
+// coins 硬币数量
+func (c *Client) AddCoins(id string, coins int) error {
+	uri := "https://api.bilibili.com/x/web-interface/coin/add"
+
+	httpClient := c.getHttpClient(true).Post(uri)
+
+	if strings.HasPrefix(id, "BV") {
+		httpClient.AddParams("bvid", id)
+	} else {
+		httpClient.AddParams("aid", id)
+	}
+
+	var baseResp BaseResponse
+	err := httpClient.
+		AddParams("multiply", strconv.Itoa(coins)).
+		AddParams("csrf", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return fmt.Errorf("%s", bts)
+	}
+
+	return nil
+}

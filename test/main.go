@@ -23,6 +23,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//err := client.AddCoins("BV19u4y1D7GT", 2)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//
+	//fmt.Println("OK")
+
 	printIt(client.GetExpReword())
 
 	//printIt(client.GetFriends())
