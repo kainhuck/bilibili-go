@@ -22,7 +22,7 @@ JNrRuoEUXpabUzGB8QIDAQAB
 
 	block, _ := pem.Decode(publicKeyPem)
 	if block == nil {
-		return "", fmt.Errorf("Failed to decode public key")
+		return "", fmt.Errorf("failed to decode public key")
 	}
 
 	publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
@@ -32,20 +32,15 @@ JNrRuoEUXpabUzGB8QIDAQAB
 
 	rsaPublicKey, ok := publicKey.(*rsa.PublicKey)
 	if !ok {
-		return "", fmt.Errorf("Not an RSA public key")
+		return "", fmt.Errorf("not an RSA public key")
 	}
 
-	label := []byte("")
-	hash := sha256.New()
-	hash.Write([]byte(fmt.Sprintf("refresh_%d", ts)))
-	hashed := hash.Sum(nil)
-
 	encrypted, err := rsa.EncryptOAEP(
-		hash,
+		sha256.New(),
 		rand.Reader,
 		rsaPublicKey,
-		hashed,
-		label,
+		[]byte(fmt.Sprintf("refresh_%d", ts)),
+		nil,
 	)
 
 	if err != nil {

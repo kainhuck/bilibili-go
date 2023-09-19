@@ -5,6 +5,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
+	"github.com/kainhuck/bilibili-go/internal/utils"
 	"github.com/spf13/cast"
 	"net/http"
 	"strconv"
@@ -336,8 +338,8 @@ func (c *Client) GetUserCard(mid interface{}, photo bool) (*GetUserCardResponse,
 	return rsp, err
 }
 
-// getMyInfo 登陆用户空间详细信息 https://api.bilibili.com/x/space/myinfo
-func (c *Client) getMyInfo() (*GetMyInfoResponse, error) {
+// GetMyInfo 登陆用户空间详细信息 https://api.bilibili.com/x/space/myinfo
+func (c *Client) GetMyInfo() (*GetMyInfoResponse, error) {
 	uri := "https://api.bilibili.com/x/space/myinfo"
 
 	var baseResp BaseResponse
@@ -1087,4 +1089,78 @@ func (c *Client) getCookieInfo() (*CookieInfo, error) {
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
 	return rsp, err
+}
+
+// getRefreshCSRF 获取 refresh_csrf
+func (c *Client) getRefreshCSRF() (string, error) {
+	path, err := utils.GetCorrespondPath(time.Now().UnixMilli())
+	if err != nil {
+		return "", err
+	}
+
+	uri := "https://www.bilibili.com/correspond/1/" + path
+
+	_, body, err := c.getHttpClient(true).Get(uri).End()
+	if err != nil {
+		return "", err
+	}
+
+	doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(body))
+	if err != nil {
+		return "", err
+	}
+
+	return doc.Find("#1-name").First().Text(), err
+}
+
+// refreshCookie 刷新cookie
+func (c *Client) refreshCookie(refreshCsrf string) (*RefreshCookieResponse, []*http.Cookie, error) {
+	uri := "https://passport.bilibili.com/x/passport-login/web/cookie/refresh"
+
+	var baseResp BaseResponse
+	var cookies []*http.Cookie
+
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("refresh_csrf", refreshCsrf).
+		AddFormData("refresh_token", c.authInfo.RefreshToken).
+		EndStruct(&baseResp, func(response *http.Response) error {
+			cookies = response.Cookies()
+
+			return nil
+		})
+	if err != nil {
+		return nil, nil, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &RefreshCookieResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, cookies, err
+
+}
+
+// confirmRefresh 确认更新
+func (c *Client) confirmRefresh(refreshToken string) error {
+	uri := "https://passport.bilibili.com/x/passport-login/web/confirm/refresh"
+
+	var baseResp BaseResponse
+
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("refresh_token", refreshToken).
+		EndStruct(&baseResp)
+	if err != nil {
+		return err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return fmt.Errorf("%s", bts)
+	}
+
+	return nil
 }

@@ -10,7 +10,7 @@ import (
 
 func main() {
 	client := bilibili_go.NewClient(
-		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.json")),
+		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.wby.json")),
 		bilibili_go.WithDebug(false),
 		bilibili_go.WithShowQRCodeFunc(func(code *qrcode.QRCode) error {
 
@@ -19,7 +19,7 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	//printIt(client.GetMyInfo(false))
+	printIt(client.GetMyInfo())
 
 	//printIt(client.GetFriends())
 	//tags, err := client.GetRelationTags()
@@ -90,7 +90,7 @@ func SearchUserInfo(client *bilibili_go.Client) {
 	fmt.Printf("用户名：%v，粉丝数：%v，头衔：%v\n", card.Card.Name, card.Card.Fans, card.Card.Official.Title)
 
 	// 2. 查询自身信息
-	resp, err := client.GetMyInfo(false)
+	resp, err := client.GetMyInfo()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -724,3 +724,10 @@ type CookieInfo struct {
 	Refresh   bool  `json:"refresh"`
 	Timestamp int64 `json:"timestamp"`
 }
+
+// RefreshCookieResponse ...
+type RefreshCookieResponse struct {
+	Status       int    `json:"status"`
+	Message      string `json:"message"`
+	RefreshToken string `json:"refresh_token"`
+}
