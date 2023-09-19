@@ -32,12 +32,12 @@ func main() {
 	//
 	//printIt(client.GetExpReword())
 
-	resp, err := client.GetLatestVideo(1, 5, bilibili_go.LifeGroup.MainTid())
+	resp, err := client.GetPreciousVideo()
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, each := range resp.Archives {
-		fmt.Println(each.Bvid, each.Title, each.Stat.View)
+	for _, each := range resp {
+		fmt.Printf("%s\t%s\t%s\t%d\n", each.Title, each.Bvid, each.Owner.Name, each.Stat.View)
 	}
 
 	//printIt(client.GetFriends())

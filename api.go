@@ -1431,7 +1431,7 @@ func (c *Client) GetVideoRank(tid int) ([]*Video, error) {
 // GetLatestVideo 最新视频列表
 // pn 页码
 // ps 每页项数
-// tid 分区ID
+// tid 分区ID 不能为0
 func (c *Client) GetLatestVideo(pn int, ps int, tid int) (*GetLatestVideoResponse, error) {
 	uri := "https://api.bilibili.com/x/web-interface/dynamic/region"
 
@@ -1454,4 +1454,28 @@ func (c *Client) GetLatestVideo(pn int, ps int, tid int) (*GetLatestVideoRespons
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
 	return rsp, err
+}
+
+// GetPreciousVideo 入站必刷视频
+func (c *Client) GetPreciousVideo() ([]*Video, error) {
+	uri := "https://api.bilibili.com/x/web-interface/popular/precious"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &struct {
+		List []*Video `json:"list"`
+	}{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp.List, err
 }
