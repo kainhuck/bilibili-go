@@ -23,12 +23,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//err := client.AddCoins("BV19u4y1D7GT", 2)
+	//count, err := client.ShareVideo("BV19u4y1D7GT")
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
 	//
-	//fmt.Println("OK")
+	//fmt.Println("OK", count)
 
 	printIt(client.GetExpReword())
 

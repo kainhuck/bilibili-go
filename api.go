@@ -1215,3 +1215,34 @@ func (c *Client) AddCoins(id string, coins int) error {
 
 	return nil
 }
+
+// ShareVideo 分享视频
+// id 视频ID av号或者bv号
+func (c *Client) ShareVideo(id string) (int, error) {
+	uri := "https://api.bilibili.com/x/web-interface/share/add"
+
+	httpClient := c.getHttpClient(true).Post(uri)
+
+	if strings.HasPrefix(id, "BV") {
+		httpClient.AddParams("bvid", id)
+	} else {
+		httpClient.AddParams("aid", id)
+	}
+
+	var baseResp BaseResponse
+	err := httpClient.
+		AddParams("csrf", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return 0, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return 0, fmt.Errorf("%s", bts)
+	}
+
+	var data int
+	err = json.Unmarshal(baseResp.RawData(), &data)
+
+	return data, err
+}
