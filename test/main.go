@@ -23,12 +23,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	result, err := client.TripleVideo("BV19u4y1D7GT")
+	err := client.UnLikeVideo("BV19u4y1D7GT")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("OK", result)
+	fmt.Println("OK")
 
 	printIt(client.GetExpReword())
 

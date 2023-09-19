@@ -22,7 +22,7 @@ type Client struct {
 	httpClient       *net.HttpClient
 	authInfo         *AuthInfo
 	authStorage      AuthStorage
-	cookieCache      map[string]string
+	csrf             string
 	wbiKey           string // imgKey + subKey
 	wbiKeyLastUpdate time.Time
 	debug            *debugInfo
@@ -38,7 +38,6 @@ func NewClient(opts ...Option) *Client {
 
 	return &Client{
 		httpClient:     client,
-		cookieCache:    make(map[string]string),
 		authStorage:    opt.AuthStorage,
 		debug:          opt.Debug,
 		logger:         opt.Logger,
@@ -52,7 +51,9 @@ func (c *Client) setAuthInfo(auth *AuthInfo) {
 		return
 	}
 	for _, cookie := range c.authInfo.Cookies {
-		c.cookieCache[cookie.Name] = cookie.Value
+		if cookie.Name == "bili_jct" {
+			c.csrf = cookie.Value
+		}
 	}
 }
 

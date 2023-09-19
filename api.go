@@ -218,7 +218,7 @@ func (c *Client) UploadCover(imageData []byte) (*UploadCoverResponse, error) {
 	err := c.getHttpClient(true).Post(uri).
 		AddParams("t", strconv.FormatInt(time.Now().UnixMilli(), 10)).
 		AddFormData("cover", "data:image/jpeg;base64,"+base64Str).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -238,7 +238,7 @@ func (c *Client) UploadCover(imageData []byte) (*UploadCoverResponse, error) {
 func (c *Client) SubmitVideo(req *SubmitRequest) (*SubmitResponse, error) {
 	uri := "https://member.bilibili.com/x/vu/web/add/v3"
 
-	req.CSRF = c.cookieCache["bili_jct"]
+	req.CSRF = c.csrf
 
 	reqData, err := json.Marshal(req)
 	if err != nil {
@@ -251,7 +251,7 @@ func (c *Client) SubmitVideo(req *SubmitRequest) (*SubmitResponse, error) {
 		SetContentType("application/json;charset=UTF-8").
 		Post(uri).
 		AddParams("t", strconv.FormatInt(time.Now().UnixMilli(), 10)).
-		AddParams("csrf", c.cookieCache["bili_jct"]).
+		AddParams("csrf", c.csrf).
 		SendBody(bytes.NewReader(reqData)).
 		EndStruct(&baseResp)
 	if err != nil {
@@ -668,7 +668,7 @@ func (c *Client) ModifyRelation(mid interface{}, act int, reSrc int) error {
 		AddFormData("fid", cast.ToString(mid)).
 		AddFormData("act", strconv.Itoa(act)).
 		AddFormData("re_src", strconv.Itoa(reSrc)).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -702,7 +702,7 @@ func (c *Client) BatchModifyRelation(mids []string, act int, reSrc int) (*BatchM
 		AddFormData("fids", strings.Join(mids, ",")).
 		AddFormData("act", strconv.Itoa(act)).
 		AddFormData("re_src", strconv.Itoa(reSrc)).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -891,7 +891,7 @@ func (c *Client) CreateRelationTag(name string) (*CreateRelationTagResponse, err
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Post(uri).
 		AddFormData("tag", name).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -918,7 +918,7 @@ func (c *Client) UpdateRelationTag(tagId int, name string) error {
 	err := c.getHttpClient(true).Post(uri).
 		AddFormData("tagid", strconv.Itoa(tagId)).
 		AddFormData("name", name).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -939,7 +939,7 @@ func (c *Client) DeleteRelationTag(tagId int) error {
 
 	err := c.getHttpClient(true).Post(uri).
 		AddFormData("tagid", strconv.Itoa(tagId)).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -970,7 +970,7 @@ func (c *Client) AddUsersToRelationTags(mids []string, tagIds []int) error {
 	err := c.getHttpClient(true).Post(uri).
 		AddFormData("fids", strings.Join(mids, ",")).
 		AddFormData("tagids", strings.Join(tagIdsString, ",")).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -999,7 +999,7 @@ func (c *Client) CopyUsersToRelationTags(mids []string, tagIds []int) error {
 	err := c.getHttpClient(true).Post(uri).
 		AddFormData("fids", strings.Join(mids, ",")).
 		AddFormData("tagids", strings.Join(tagIdsString, ",")).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -1034,7 +1034,7 @@ func (c *Client) MoveUsersToRelationTags(mids []string, beforeTagIds []int, afte
 		AddFormData("fids", strings.Join(mids, ",")).
 		AddFormData("beforeTagids", strings.Join(beforeTagIdsString, ",")).
 		AddFormData("afterTagids", strings.Join(afterTagIdsString, ",")).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -1053,7 +1053,7 @@ func (c *Client) logout() (*LogoutResponse, error) {
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Post(uri).
-		AddFormData("biliCSRF", c.cookieCache["bili_jct"]).
+		AddFormData("biliCSRF", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -1075,7 +1075,7 @@ func (c *Client) getCookieInfo() (*CookieInfo, error) {
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Get(uri).
-		AddParams("biliCSRF", c.cookieCache["bili_jct"]).
+		AddParams("biliCSRF", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -1121,7 +1121,7 @@ func (c *Client) refreshCookie(refreshCsrf string) (*RefreshCookieResponse, []*h
 	var cookies []*http.Cookie
 
 	err := c.getHttpClient(true).Post(uri).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		AddFormData("refresh_csrf", refreshCsrf).
 		AddFormData("refresh_token", c.authInfo.RefreshToken).
 		EndStruct(&baseResp, func(response *http.Response) error {
@@ -1151,7 +1151,7 @@ func (c *Client) confirmRefresh(refreshToken string) error {
 	var baseResp BaseResponse
 
 	err := c.getHttpClient(true).Post(uri).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		AddFormData("refresh_token", refreshToken).
 		EndStruct(&baseResp)
 	if err != nil {
@@ -1203,7 +1203,7 @@ func (c *Client) CoinVideo(id string, coins int) error {
 	var baseResp BaseResponse
 	err := httpClient.
 		AddParams("multiply", strconv.Itoa(coins)).
-		AddParams("csrf", c.cookieCache["bili_jct"]).
+		AddParams("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -1263,7 +1263,7 @@ func (c *Client) ShareVideo(id string) (int, error) {
 
 	var baseResp BaseResponse
 	err := httpClient.
-		AddParams("csrf", c.cookieCache["bili_jct"]).
+		AddParams("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return 0, err
@@ -1296,7 +1296,7 @@ func (c *Client) likeVideo(id string, like int) error {
 	var baseResp BaseResponse
 	err := httpClient.
 		AddParams("like", strconv.Itoa(like)).
-		AddParams("csrf", c.cookieCache["bili_jct"]).
+		AddParams("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -1354,7 +1354,7 @@ func (c *Client) TripleVideo(id string) (*TripleVideoResponse, error) {
 
 	var baseResp BaseResponse
 	err := httpClient.
-		AddParams("csrf", c.cookieCache["bili_jct"]).
+		AddParams("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
