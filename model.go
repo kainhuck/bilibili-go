@@ -731,3 +731,15 @@ type RefreshCookieResponse struct {
 	Message      string `json:"message"`
 	RefreshToken string `json:"refresh_token"`
 }
+
+// ExpReward 每日经验奖励状态
+type ExpReward struct {
+	Login        bool `json:"login"`         // 每日登陆 true 已完成 false 未完成 完成奖励5经验
+	Watch        bool `json:"watch"`         // 每日观看 true 已完成 false 未完成 完成奖励5经验
+	Coins        int  `json:"coins"`         // 每日投币所奖励的经验 上限50 注：该值更新存在延迟
+	Share        bool `json:"share"`         // 每日分享 true 已完成 false 未完成 完成奖励5经验
+	Email        bool `json:"email"`         // 绑定邮箱 false 未完成 true 已完成 首次完成奖励20经验
+	Tel          bool `json:"tel"`           // 绑定手机号 false 未完成 true 已完成 首次完成奖励100经验
+	SafeQuestion bool `json:"safe_question"` // 设置密保问题 false 未完成 true 已完成 首次完成奖励30经验
+	IdentifyCard bool `json:"identify_card"` // 实名认证 false 未完成 true 已完成 首次完成奖励50经验
+}

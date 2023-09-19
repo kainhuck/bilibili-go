@@ -62,8 +62,8 @@ func (c *Client) qrcodePoll(qrcodeKey string) (*QrcodePollResponse, []*http.Cook
 	return rsp, cookies, err
 }
 
-// GetAccount 获取个人账号信息 https://api.bilibili.com/x/member/web/account
-func (c *Client) GetAccount() (*AccountResponse, error) {
+// GetMyAccount 获取个人账号信息 https://api.bilibili.com/x/member/web/account
+func (c *Client) GetMyAccount() (*AccountResponse, error) {
 	uri := "https://api.bilibili.com/x/member/web/account"
 
 	var baseResp BaseResponse
@@ -1163,4 +1163,25 @@ func (c *Client) confirmRefresh(refreshToken string) error {
 	}
 
 	return nil
+}
+
+// GetExpReword 查询每日奖励状态 https://api.bilibili.com/x/member/web/exp/reward
+func (c *Client) GetExpReword() (*ExpReward, error) {
+	uri := "https://api.bilibili.com/x/member/web/exp/reward"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &ExpReward{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
 }

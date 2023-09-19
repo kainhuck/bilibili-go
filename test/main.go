@@ -10,7 +10,7 @@ import (
 
 func main() {
 	client := bilibili_go.NewClient(
-		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.wby.json")),
+		bilibili_go.WithAuthStorage(bilibili_go.NewFileAuthStorage("bilibili.json")),
 		bilibili_go.WithDebug(false),
 		bilibili_go.WithShowQRCodeFunc(func(code *qrcode.QRCode) error {
 
@@ -23,7 +23,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	printIt(client.GetMyInfo())
+	printIt(client.GetExpReword())
 
 	//printIt(client.GetFriends())
 	//tags, err := client.GetRelationTags()

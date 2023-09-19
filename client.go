@@ -90,7 +90,7 @@ func (c *Client) LoginWithQrCode() {
 		auth, err := c.authStorage.LoadAuthInfo()
 		if err == nil && auth != nil {
 			c.setAuthInfo(auth)
-			user, err := c.GetMyInfo()
+			user, err := c.GetMyAccount()
 			if err == nil {
 				c.mid = user.Mid
 				c.logger.Info("load auth info from storage")
@@ -143,7 +143,7 @@ func (c *Client) LoginWithQrCode() {
 				Cookies:      cookies,
 				RefreshToken: resp.RefreshToken,
 			})
-			user, err := c.GetMyInfo()
+			user, err := c.GetMyAccount()
 			if err != nil {
 				c.logger.Errorf("login failed: %v", err)
 				os.Exit(-1)
