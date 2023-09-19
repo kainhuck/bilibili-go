@@ -32,11 +32,11 @@ func main() {
 	//
 	//printIt(client.GetExpReword())
 
-	resp, err := client.GetPopularVideoList(1, 10, false)
+	resp, err := client.GetVideoRank(bilibili_go.LifeGroup.MainTid())
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, each := range resp.List {
+	for _, each := range resp {
 		fmt.Println(each.Bvid, each.Title, each.Stat.View)
 	}
 

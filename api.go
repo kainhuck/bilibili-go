@@ -1397,3 +1397,33 @@ func (c *Client) GetPopularVideoList(pn int, ps int, common bool) (*GetPopularVi
 
 	return rsp, err
 }
+
+// GetVideoRank 获取视频排行榜
+// tid 分区ID 0 则不分区
+func (c *Client) GetVideoRank(tid int) ([]*Video, error) {
+	uri := "https://api.bilibili.com/x/web-interface/ranking/v2"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("rid", strconv.Itoa(tid)).
+		AddParams("type", "all").
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &struct {
+		List []*Video `json:"list"`
+	}{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+	if err != nil {
+		return nil, err
+	}
+
+	return rsp.List, nil
+}
