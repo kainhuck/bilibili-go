@@ -743,3 +743,11 @@ type ExpReward struct {
 	SafeQuestion bool `json:"safe_question"` // 设置密保问题 false 未完成 true 已完成 首次完成奖励30经验
 	IdentifyCard bool `json:"identify_card"` // 实名认证 false 未完成 true 已完成 首次完成奖励50经验
 }
+
+// TripleVideoResponse ...
+type TripleVideoResponse struct {
+	Like     bool `json:"like"`     // 是否点赞成功
+	Coin     bool `json:"coin"`     // 是否投币成功
+	Fav      bool `json:"fav"`      // 是否收藏成功
+	Multiply int  `json:"multiply"` // 投币数量
+}

@@ -1186,10 +1186,10 @@ func (c *Client) GetExpReword() (*ExpReward, error) {
 	return rsp, err
 }
 
-// AddCoins 视频投币
+// CoinVideo 视频投币
 // id 视频ID av号或者bv号
 // coins 硬币数量
-func (c *Client) AddCoins(id string, coins int) error {
+func (c *Client) CoinVideo(id string, coins int) error {
 	uri := "https://api.bilibili.com/x/web-interface/coin/add"
 
 	httpClient := c.getHttpClient(true).Post(uri)
@@ -1214,6 +1214,37 @@ func (c *Client) AddCoins(id string, coins int) error {
 	}
 
 	return nil
+}
+
+// HasCoinVideo 判断视频是否已经投币
+// id 视频ID av号或者bv号
+// 返回已投的硬币数量
+func (c *Client) HasCoinVideo(id string) (int, error) {
+	uri := "https://api.bilibili.com/x/web-interface/archive/coins"
+
+	httpClient := c.getHttpClient(true).Get(uri)
+
+	if strings.HasPrefix(id, "BV") {
+		httpClient.AddParams("bvid", id)
+	} else {
+		httpClient.AddParams("aid", id)
+	}
+
+	var baseResp BaseResponse
+	err := httpClient.
+		EndStruct(&baseResp)
+	if err != nil {
+		return 0, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return 0, fmt.Errorf("%s", bts)
+	}
+
+	var data map[string]int
+	err = json.Unmarshal(baseResp.RawData(), &data)
+
+	return data["multiply"], err
 }
 
 // ShareVideo 分享视频
@@ -1276,4 +1307,65 @@ func (c *Client) likeVideo(id string, like int) error {
 	}
 
 	return nil
+}
+
+// HasLikeVideo 判断视频是否已经点赞
+// id 视频ID av号或者bv号
+// 返回 0 未点赞 1 已点赞
+func (c *Client) HasLikeVideo(id string) (int, error) {
+	uri := "https://api.bilibili.com/x/web-interface/archive/has/like"
+
+	httpClient := c.getHttpClient(true).Get(uri)
+
+	if strings.HasPrefix(id, "BV") {
+		httpClient.AddParams("bvid", id)
+	} else {
+		httpClient.AddParams("aid", id)
+	}
+
+	var baseResp BaseResponse
+	err := httpClient.
+		EndStruct(&baseResp)
+	if err != nil {
+		return 0, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return 0, fmt.Errorf("%s", bts)
+	}
+
+	var data int
+	err = json.Unmarshal(baseResp.RawData(), &data)
+
+	return data, err
+}
+
+// TripleVideo 一键三连
+func (c *Client) TripleVideo(id string) (*TripleVideoResponse, error) {
+	uri := "https://api.bilibili.com/x/web-interface/archive/like/triple"
+
+	httpClient := c.getHttpClient(true).Post(uri)
+
+	if strings.HasPrefix(id, "BV") {
+		httpClient.AddParams("bvid", id)
+	} else {
+		httpClient.AddParams("aid", id)
+	}
+
+	var baseResp BaseResponse
+	err := httpClient.
+		AddParams("csrf", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &TripleVideoResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
 }
