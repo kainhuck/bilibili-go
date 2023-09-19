@@ -22,12 +22,13 @@ type Client struct {
 	httpClient       *net.HttpClient
 	authInfo         *AuthInfo
 	authStorage      AuthStorage
-	cookieCache      map[string]string
+	csrf             string
 	wbiKey           string // imgKey + subKey
 	wbiKeyLastUpdate time.Time
 	debug            *debugInfo
 	logger           Logger
 	showQRCodeFunc   func(code *qrcode.QRCode) error
+	mid              int64 // 当前用户mid
 }
 
 func NewClient(opts ...Option) *Client {
@@ -37,7 +38,6 @@ func NewClient(opts ...Option) *Client {
 
 	return &Client{
 		httpClient:     client,
-		cookieCache:    make(map[string]string),
 		authStorage:    opt.AuthStorage,
 		debug:          opt.Debug,
 		logger:         opt.Logger,
@@ -51,7 +51,9 @@ func (c *Client) setAuthInfo(auth *AuthInfo) {
 		return
 	}
 	for _, cookie := range c.authInfo.Cookies {
-		c.cookieCache[cookie.Name] = cookie.Value
+		if cookie.Name == "bili_jct" {
+			c.csrf = cookie.Value
+		}
 	}
 }
 
@@ -89,13 +91,9 @@ func (c *Client) LoginWithQrCode() {
 		auth, err := c.authStorage.LoadAuthInfo()
 		if err == nil && auth != nil {
 			c.setAuthInfo(auth)
-			user, err := c.getMyInfo()
+			user, err := c.GetMyAccount()
 			if err == nil {
-				c.authInfo.User = user
-				if err := c.authStorage.SaveAuthInfo(c.authInfo); err != nil {
-					c.logger.Errorf("SaveAuthInfo failed: %v", err)
-					os.Exit(-1)
-				}
+				c.mid = user.Mid
 				c.logger.Info("load auth info from storage")
 				return
 			} else {
@@ -146,12 +144,12 @@ func (c *Client) LoginWithQrCode() {
 				Cookies:      cookies,
 				RefreshToken: resp.RefreshToken,
 			})
-			resp, err := c.getMyInfo()
+			user, err := c.GetMyAccount()
 			if err != nil {
 				c.logger.Errorf("login failed: %v", err)
 				os.Exit(-1)
 			}
-			c.authInfo.User = resp
+			c.mid = user.Mid
 			c.logger.Infof("login success!!!")
 			return
 		case 86038:
@@ -181,7 +179,7 @@ func (c *Client) Logout() (string, error) {
 }
 
 // UploadVideoFromDisk 从本地磁盘上传视频 videoPath 视频路径
-func (c *Client) UploadVideoFromDisk(videoPath string) (*Video, error) {
+func (c *Client) UploadVideoFromDisk(videoPath string) (*SubmitVideo, error) {
 	fileInfo, err := os.Stat(videoPath)
 	if err != nil {
 		return nil, err
@@ -196,7 +194,7 @@ func (c *Client) UploadVideoFromDisk(videoPath string) (*Video, error) {
 }
 
 // UploadVideoFromReader ...
-func (c *Client) UploadVideoFromReader(filename string, reader io.Reader) (*Video, error) {
+func (c *Client) UploadVideoFromReader(filename string, reader io.Reader) (*SubmitVideo, error) {
 	content, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
@@ -206,7 +204,7 @@ func (c *Client) UploadVideoFromReader(filename string, reader io.Reader) (*Vide
 }
 
 // UploadVideoFromHTTP 从http链接上传文件
-func (c *Client) UploadVideoFromHTTP(filename string, url string) (*Video, error) {
+func (c *Client) UploadVideoFromHTTP(filename string, url string) (*SubmitVideo, error) {
 	c.logger.Infof("start download file: %v, from: %v", filename, url)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -218,7 +216,7 @@ func (c *Client) UploadVideoFromHTTP(filename string, url string) (*Video, error
 }
 
 // UploadVideo 视频上传，filename 文件名 content 视频内容
-func (c *Client) UploadVideo(filename string, content []byte) (*Video, error) {
+func (c *Client) UploadVideo(filename string, content []byte) (*SubmitVideo, error) {
 	filesize := int64(len(content))
 	// 调接口上传
 	// 1. 预上传
@@ -279,7 +277,7 @@ func (c *Client) UploadVideo(filename string, content []byte) (*Video, error) {
 
 	c.logger.Infof("video upload finished success，cid: %v", preResp.BizID)
 
-	return &Video{
+	return &SubmitVideo{
 		Filename: preResp.Filename(),
 		Title:    strings.Split(filename, ".")[0],
 		Desc:     "",
@@ -319,22 +317,6 @@ func (c *Client) UploadCoverFromHTTP(url string) (*UploadCoverResponse, error) {
 	return c.UploadCoverFromReader(resp.Body)
 }
 
-// GetMyInfo 获取当前用户信息
-func (c *Client) GetMyInfo(refresh bool) (*GetMyInfoResponse, error) {
-	if c.authInfo.User != nil && !refresh {
-		return c.authInfo.User, nil
-	}
-	user, err := c.getMyInfo()
-	if err != nil {
-		return nil, err
-	}
-	c.authInfo.User = user
-
-	_ = c.authStorage.SaveAuthInfo(c.authInfo)
-
-	return user, nil
-}
-
 // Follow 关注用户
 func (c *Client) Follow(mid interface{}) error {
 	return c.ModifyRelation(mid, 1, 11)
@@ -367,17 +349,75 @@ func (c *Client) UnBlock(mid interface{}) error {
 
 // GetFollowers 查询自己的粉丝
 func (c *Client) GetFollowers(ps int, pn int) (*RelationUserResponse, error) {
-	return c.GetUserFollowers(c.authInfo.User.Mid, ps, pn)
+	return c.GetUserFollowers(c.mid, ps, pn)
 }
 
 // GetFollowings 查询自己的关注
 func (c *Client) GetFollowings(orderType string, ps int, pn int) (*RelationUserResponse, error) {
-	return c.GetUserFollowings(c.authInfo.User.Mid, orderType, ps, pn)
+	return c.GetUserFollowings(c.mid, orderType, ps, pn)
 }
 
 // GetFollowingsV2 查询自己的关注
 func (c *Client) GetFollowingsV2(ps int, pn int) (*RelationUserResponse, error) {
-	return c.GetUserFollowingsV2(c.authInfo.User.Mid, ps, pn)
+	return c.GetUserFollowingsV2(c.mid, ps, pn)
+}
+
+// RefreshAuthInfo 刷新token信息
+func (c *Client) RefreshAuthInfo() error {
+	// 1. 判断是否需要刷新cookie
+	cookieInfo, err := c.getCookieInfo()
+	if err != nil {
+		return err
+	}
+	if !cookieInfo.Refresh {
+		return nil
+	}
+
+	c.logger.Info("refresh auth info")
+
+	oldRefreshToken := c.authInfo.RefreshToken
+
+	// 2. 获取refresh_csrf
+	csrf, err := c.getRefreshCSRF()
+	if err != nil {
+		return err
+	}
+
+	// 3. 刷新cookie
+	resp, cookies, err := c.refreshCookie(csrf)
+	if err != nil {
+		return err
+	}
+
+	// 4. 保存新的cookie
+	c.setAuthInfo(&AuthInfo{
+		Cookies:      cookies,
+		RefreshToken: resp.RefreshToken,
+	})
+
+	// 5. 确认更新
+	if err := c.confirmRefresh(oldRefreshToken); err != nil {
+		return err
+	}
+
+	// 6. 持久化
+	if c.authStorage != nil {
+		if err := c.authStorage.SaveAuthInfo(c.authInfo); err != nil {
+			c.logger.Errorf("SaveAuthInfo failed: %v", err)
+		}
+	}
+
+	return nil
+}
+
+// LikeVideo 点赞视频
+func (c *Client) LikeVideo(id string) error {
+	return c.likeVideo(id, 1)
+}
+
+// UnLikeVideo 取消点赞
+func (c *Client) UnLikeVideo(id string) error {
+	return c.likeVideo(id, 2)
 }
 
 /* ===================== helper ===================== */

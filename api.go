@@ -5,6 +5,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
+	"github.com/kainhuck/bilibili-go/internal/utils"
 	"github.com/spf13/cast"
 	"net/http"
 	"strconv"
@@ -60,8 +62,8 @@ func (c *Client) qrcodePoll(qrcodeKey string) (*QrcodePollResponse, []*http.Cook
 	return rsp, cookies, err
 }
 
-// GetAccount 获取个人账号信息 https://api.bilibili.com/x/member/web/account
-func (c *Client) GetAccount() (*AccountResponse, error) {
+// GetMyAccount 获取个人账号信息 https://api.bilibili.com/x/member/web/account
+func (c *Client) GetMyAccount() (*AccountResponse, error) {
 	uri := "https://api.bilibili.com/x/member/web/account"
 
 	var baseResp BaseResponse
@@ -216,7 +218,7 @@ func (c *Client) UploadCover(imageData []byte) (*UploadCoverResponse, error) {
 	err := c.getHttpClient(true).Post(uri).
 		AddParams("t", strconv.FormatInt(time.Now().UnixMilli(), 10)).
 		AddFormData("cover", "data:image/jpeg;base64,"+base64Str).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -236,7 +238,7 @@ func (c *Client) UploadCover(imageData []byte) (*UploadCoverResponse, error) {
 func (c *Client) SubmitVideo(req *SubmitRequest) (*SubmitResponse, error) {
 	uri := "https://member.bilibili.com/x/vu/web/add/v3"
 
-	req.CSRF = c.cookieCache["bili_jct"]
+	req.CSRF = c.csrf
 
 	reqData, err := json.Marshal(req)
 	if err != nil {
@@ -249,7 +251,7 @@ func (c *Client) SubmitVideo(req *SubmitRequest) (*SubmitResponse, error) {
 		SetContentType("application/json;charset=UTF-8").
 		Post(uri).
 		AddParams("t", strconv.FormatInt(time.Now().UnixMilli(), 10)).
-		AddParams("csrf", c.cookieCache["bili_jct"]).
+		AddParams("csrf", c.csrf).
 		SendBody(bytes.NewReader(reqData)).
 		EndStruct(&baseResp)
 	if err != nil {
@@ -336,8 +338,8 @@ func (c *Client) GetUserCard(mid interface{}, photo bool) (*GetUserCardResponse,
 	return rsp, err
 }
 
-// getMyInfo 登陆用户空间详细信息 https://api.bilibili.com/x/space/myinfo
-func (c *Client) getMyInfo() (*GetMyInfoResponse, error) {
+// GetMyInfo 登陆用户空间详细信息 https://api.bilibili.com/x/space/myinfo
+func (c *Client) GetMyInfo() (*GetMyInfoResponse, error) {
 	uri := "https://api.bilibili.com/x/space/myinfo"
 
 	var baseResp BaseResponse
@@ -666,7 +668,7 @@ func (c *Client) ModifyRelation(mid interface{}, act int, reSrc int) error {
 		AddFormData("fid", cast.ToString(mid)).
 		AddFormData("act", strconv.Itoa(act)).
 		AddFormData("re_src", strconv.Itoa(reSrc)).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -700,7 +702,7 @@ func (c *Client) BatchModifyRelation(mids []string, act int, reSrc int) (*BatchM
 		AddFormData("fids", strings.Join(mids, ",")).
 		AddFormData("act", strconv.Itoa(act)).
 		AddFormData("re_src", strconv.Itoa(reSrc)).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -889,7 +891,7 @@ func (c *Client) CreateRelationTag(name string) (*CreateRelationTagResponse, err
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Post(uri).
 		AddFormData("tag", name).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -916,7 +918,7 @@ func (c *Client) UpdateRelationTag(tagId int, name string) error {
 	err := c.getHttpClient(true).Post(uri).
 		AddFormData("tagid", strconv.Itoa(tagId)).
 		AddFormData("name", name).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -937,7 +939,7 @@ func (c *Client) DeleteRelationTag(tagId int) error {
 
 	err := c.getHttpClient(true).Post(uri).
 		AddFormData("tagid", strconv.Itoa(tagId)).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -968,7 +970,7 @@ func (c *Client) AddUsersToRelationTags(mids []string, tagIds []int) error {
 	err := c.getHttpClient(true).Post(uri).
 		AddFormData("fids", strings.Join(mids, ",")).
 		AddFormData("tagids", strings.Join(tagIdsString, ",")).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -997,7 +999,7 @@ func (c *Client) CopyUsersToRelationTags(mids []string, tagIds []int) error {
 	err := c.getHttpClient(true).Post(uri).
 		AddFormData("fids", strings.Join(mids, ",")).
 		AddFormData("tagids", strings.Join(tagIdsString, ",")).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -1032,7 +1034,7 @@ func (c *Client) MoveUsersToRelationTags(mids []string, beforeTagIds []int, afte
 		AddFormData("fids", strings.Join(mids, ",")).
 		AddFormData("beforeTagids", strings.Join(beforeTagIdsString, ",")).
 		AddFormData("afterTagids", strings.Join(afterTagIdsString, ",")).
-		AddFormData("csrf", c.cookieCache["bili_jct"]).
+		AddFormData("csrf", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return err
@@ -1051,7 +1053,7 @@ func (c *Client) logout() (*LogoutResponse, error) {
 
 	var baseResp BaseResponse
 	err := c.getHttpClient(true).Post(uri).
-		AddFormData("biliCSRF", c.cookieCache["bili_jct"]).
+		AddFormData("biliCSRF", c.csrf).
 		EndStruct(&baseResp)
 	if err != nil {
 		return nil, err
@@ -1065,4 +1067,415 @@ func (c *Client) logout() (*LogoutResponse, error) {
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
 	return rsp, err
+}
+
+// getCookieInfo 检查是否需要刷新cookie https://passport.bilibili.com/x/passport-login/web/cookie/info
+func (c *Client) getCookieInfo() (*CookieInfo, error) {
+	uri := "https://passport.bilibili.com/x/passport-login/web/cookie/info"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("biliCSRF", c.csrf).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &CookieInfo{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// getRefreshCSRF 获取 refresh_csrf
+func (c *Client) getRefreshCSRF() (string, error) {
+	path, err := utils.GetCorrespondPath(time.Now().UnixMilli())
+	if err != nil {
+		return "", err
+	}
+
+	uri := "https://www.bilibili.com/correspond/1/" + path
+
+	_, body, err := c.getHttpClient(true).Get(uri).End()
+	if err != nil {
+		return "", err
+	}
+
+	doc, err := goquery.NewDocumentFromReader(bytes.NewBuffer(body))
+	if err != nil {
+		return "", err
+	}
+
+	return doc.Find("#1-name").First().Text(), err
+}
+
+// refreshCookie 刷新cookie
+func (c *Client) refreshCookie(refreshCsrf string) (*RefreshCookieResponse, []*http.Cookie, error) {
+	uri := "https://passport.bilibili.com/x/passport-login/web/cookie/refresh"
+
+	var baseResp BaseResponse
+	var cookies []*http.Cookie
+
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("csrf", c.csrf).
+		AddFormData("refresh_csrf", refreshCsrf).
+		AddFormData("refresh_token", c.authInfo.RefreshToken).
+		EndStruct(&baseResp, func(response *http.Response) error {
+			cookies = response.Cookies()
+
+			return nil
+		})
+	if err != nil {
+		return nil, nil, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &RefreshCookieResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, cookies, err
+
+}
+
+// confirmRefresh 确认更新
+func (c *Client) confirmRefresh(refreshToken string) error {
+	uri := "https://passport.bilibili.com/x/passport-login/web/confirm/refresh"
+
+	var baseResp BaseResponse
+
+	err := c.getHttpClient(true).Post(uri).
+		AddFormData("csrf", c.csrf).
+		AddFormData("refresh_token", refreshToken).
+		EndStruct(&baseResp)
+	if err != nil {
+		return err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return fmt.Errorf("%s", bts)
+	}
+
+	return nil
+}
+
+// GetExpReword 查询每日奖励状态 https://api.bilibili.com/x/member/web/exp/reward
+func (c *Client) GetExpReword() (*ExpReward, error) {
+	uri := "https://api.bilibili.com/x/member/web/exp/reward"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &ExpReward{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// CoinVideo 视频投币
+// id 视频ID av号或者bv号
+// coins 硬币数量
+func (c *Client) CoinVideo(id string, coins int) error {
+	uri := "https://api.bilibili.com/x/web-interface/coin/add"
+
+	httpClient := c.getHttpClient(true).Post(uri)
+
+	if strings.HasPrefix(id, "BV") {
+		httpClient.AddParams("bvid", id)
+	} else {
+		httpClient.AddParams("aid", id)
+	}
+
+	var baseResp BaseResponse
+	err := httpClient.
+		AddParams("multiply", strconv.Itoa(coins)).
+		AddParams("csrf", c.csrf).
+		EndStruct(&baseResp)
+	if err != nil {
+		return err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return fmt.Errorf("%s", bts)
+	}
+
+	return nil
+}
+
+// HasCoinVideo 判断视频是否已经投币
+// id 视频ID av号或者bv号
+// 返回已投的硬币数量
+func (c *Client) HasCoinVideo(id string) (int, error) {
+	uri := "https://api.bilibili.com/x/web-interface/archive/coins"
+
+	httpClient := c.getHttpClient(true).Get(uri)
+
+	if strings.HasPrefix(id, "BV") {
+		httpClient.AddParams("bvid", id)
+	} else {
+		httpClient.AddParams("aid", id)
+	}
+
+	var baseResp BaseResponse
+	err := httpClient.
+		EndStruct(&baseResp)
+	if err != nil {
+		return 0, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return 0, fmt.Errorf("%s", bts)
+	}
+
+	var data map[string]int
+	err = json.Unmarshal(baseResp.RawData(), &data)
+
+	return data["multiply"], err
+}
+
+// ShareVideo 分享视频
+// id 视频ID av号或者bv号
+// 返回该视频的分享数
+func (c *Client) ShareVideo(id string) (int, error) {
+	uri := "https://api.bilibili.com/x/web-interface/share/add"
+
+	httpClient := c.getHttpClient(true).Post(uri)
+
+	if strings.HasPrefix(id, "BV") {
+		httpClient.AddParams("bvid", id)
+	} else {
+		httpClient.AddParams("aid", id)
+	}
+
+	var baseResp BaseResponse
+	err := httpClient.
+		AddParams("csrf", c.csrf).
+		EndStruct(&baseResp)
+	if err != nil {
+		return 0, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return 0, fmt.Errorf("%s", bts)
+	}
+
+	var data int
+	err = json.Unmarshal(baseResp.RawData(), &data)
+
+	return data, err
+}
+
+// likeVideo 点赞视频
+// id 视频ID av号或者bv号
+// like 1 点赞 2 取消点赞
+func (c *Client) likeVideo(id string, like int) error {
+	uri := "https://api.bilibili.com/x/web-interface/archive/like"
+
+	httpClient := c.getHttpClient(true).Post(uri)
+
+	if strings.HasPrefix(id, "BV") {
+		httpClient.AddParams("bvid", id)
+	} else {
+		httpClient.AddParams("aid", id)
+	}
+
+	var baseResp BaseResponse
+	err := httpClient.
+		AddParams("like", strconv.Itoa(like)).
+		AddParams("csrf", c.csrf).
+		EndStruct(&baseResp)
+	if err != nil {
+		return err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return fmt.Errorf("%s", bts)
+	}
+
+	return nil
+}
+
+// HasLikeVideo 判断视频是否已经点赞
+// id 视频ID av号或者bv号
+// 返回 0 未点赞 1 已点赞
+func (c *Client) HasLikeVideo(id string) (int, error) {
+	uri := "https://api.bilibili.com/x/web-interface/archive/has/like"
+
+	httpClient := c.getHttpClient(true).Get(uri)
+
+	if strings.HasPrefix(id, "BV") {
+		httpClient.AddParams("bvid", id)
+	} else {
+		httpClient.AddParams("aid", id)
+	}
+
+	var baseResp BaseResponse
+	err := httpClient.
+		EndStruct(&baseResp)
+	if err != nil {
+		return 0, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return 0, fmt.Errorf("%s", bts)
+	}
+
+	var data int
+	err = json.Unmarshal(baseResp.RawData(), &data)
+
+	return data, err
+}
+
+// TripleVideo 一键三连
+// id 视频ID av号或者bv号
+func (c *Client) TripleVideo(id string) (*TripleVideoResponse, error) {
+	uri := "https://api.bilibili.com/x/web-interface/archive/like/triple"
+
+	httpClient := c.getHttpClient(true).Post(uri)
+
+	if strings.HasPrefix(id, "BV") {
+		httpClient.AddParams("bvid", id)
+	} else {
+		httpClient.AddParams("aid", id)
+	}
+
+	var baseResp BaseResponse
+	err := httpClient.
+		AddParams("csrf", c.csrf).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &TripleVideoResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetPopularVideoList 获取热门视频列表
+// pn 页码
+// ps 每页项数
+// common true 展示非个性化的列表 false 展示个性化列表
+func (c *Client) GetPopularVideoList(pn int, ps int, common bool) (*GetPopularVideoListResponse, error) {
+	uri := "https://api.bilibili.com/x/web-interface/popular"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(!common).Get(uri).
+		AddParams("pn", strconv.Itoa(pn)).
+		AddParams("ps", strconv.Itoa(ps)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &GetPopularVideoListResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetVideoRank 获取视频排行榜
+// tid 分区ID 0 则不分区
+func (c *Client) GetVideoRank(tid int) ([]*Video, error) {
+	uri := "https://api.bilibili.com/x/web-interface/ranking/v2"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("rid", strconv.Itoa(tid)).
+		AddParams("type", "all").
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &struct {
+		List []*Video `json:"list"`
+	}{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+	if err != nil {
+		return nil, err
+	}
+
+	return rsp.List, nil
+}
+
+// GetLatestVideo 最新视频列表
+// pn 页码
+// ps 每页项数
+// tid 分区ID 不能为0
+func (c *Client) GetLatestVideo(pn int, ps int, tid int) (*GetLatestVideoResponse, error) {
+	uri := "https://api.bilibili.com/x/web-interface/dynamic/region"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		AddParams("pn", strconv.Itoa(pn)).
+		AddParams("ps", strconv.Itoa(ps)).
+		AddParams("rid", strconv.Itoa(tid)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &GetLatestVideoResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetPreciousVideo 入站必刷视频
+func (c *Client) GetPreciousVideo() ([]*Video, error) {
+	uri := "https://api.bilibili.com/x/web-interface/popular/precious"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(true).Get(uri).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &struct {
+		List []*Video `json:"list"`
+	}{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp.List, err
 }

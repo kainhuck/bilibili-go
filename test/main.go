@@ -19,22 +19,46 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
-	printIt(client.GetMyInfo(false))
+	if err := client.RefreshAuthInfo(); err != nil {
+		log.Fatal(err)
+	}
+
+	//err := client.UnLikeVideo("BV19u4y1D7GT")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//
+	//fmt.Println("OK")
+	//
+	//printIt(client.GetExpReword())
+
+	resp, err := client.GetPreciousVideo()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, each := range resp {
+		fmt.Printf("%s\t%s\t%s\t%d\n", each.Title, each.Bvid, each.Owner.Name, each.Stat.View)
+	}
 
 	//printIt(client.GetFriends())
-
-	//myself, err := client.GetMyInfo(false)
+	//tags, err := client.GetRelationTags()
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
 
-	//printIt(client.GetRelationTags())
-	//printIt(client.GetRelationTagUsers(-10, "", 1, 1))
+	//for _, tag := range tags {
+	//	if tag.Count == 0 {
+	//		continue
+	//	}
+	//	pn := 1
+	//	for pn < tag.Count {
+	//		printIt(client.GetRelationTagUsers(tag.TagId, "", 1, pn))
+	//		pn++
+	//	}
+	//}
 
 	//RelationDemo(client)
-
 	//SearchUserInfo(client)
-
 	//SubmitVideo(client)
 }
 
@@ -63,7 +87,7 @@ func SubmitVideo(client *bilibili_go.Client) {
 		Tag:       "郊游",
 		Desc:      "我们一起去郊游吧",
 		Recreate:  -1,
-		Videos: []*bilibili_go.Video{
+		Videos: []*bilibili_go.SubmitVideo{
 			video,
 		},
 		NoReprint: 1,
@@ -85,7 +109,7 @@ func SearchUserInfo(client *bilibili_go.Client) {
 	fmt.Printf("用户名：%v，粉丝数：%v，头衔：%v\n", card.Card.Name, card.Card.Fans, card.Card.Official.Title)
 
 	// 2. 查询自身信息
-	resp, err := client.GetMyInfo(false)
+	resp, err := client.GetMyInfo()
 	if err != nil {
 		log.Fatal(err)
 	}

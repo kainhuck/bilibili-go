@@ -235,7 +235,8 @@ type UploadCoverResponse struct {
 	Url string `json:"url"`
 }
 
-type Video struct {
+// SubmitVideo 投稿视频
+type SubmitVideo struct {
 	Filename string `json:"filename"`
 	Title    string `json:"title"`
 	Desc     string `json:"desc"`
@@ -244,22 +245,22 @@ type Video struct {
 
 // SubmitRequest ...
 type SubmitRequest struct {
-	Cover            string   `json:"cover"`              // 封面 必须
-	Title            string   `json:"title"`              // 标题 必须
-	Copyright        int      `json:"copyright"`          // 是否原创 必须 1 原创 2 转载
-	Source           string   `json:"source"`             // 如果选择转载则 将原视频链接贴这里
-	Dtime            int64    `json:"dtime"`              // 设置定时发布时间，时间戳，精确到秒，如不设置则立即发送
-	TID              int      `json:"tid"`                // 分类ID 必须
-	Tag              string   `json:"tag"`                // 标签 用逗号分隔 必须
-	DescFormatID     int      `json:"desc_format_id"`     // ？
-	Desc             string   `json:"desc"`               // 简介 必须
-	Recreate         int      `json:"recreate"`           // 二创视频 -1 不允许二创 1 允许二创
-	Dynamic          string   `json:"dynamic"`            // 粉丝动态 ？
-	Interactive      int      `json:"interactive"`        // 是否是合作视频 ？
-	Videos           []*Video `json:"videos"`             // 视频 必须
-	ActReserveCreate int      `json:"act_reserve_create"` // 允许二创 ？
-	NoDisturbance    int      `json:"no_disturbance"`     // ？
-	NoReprint        int      `json:"no_reprint"`         // ？
+	Cover            string         `json:"cover"`              // 封面 必须
+	Title            string         `json:"title"`              // 标题 必须
+	Copyright        int            `json:"copyright"`          // 是否原创 必须 1 原创 2 转载
+	Source           string         `json:"source"`             // 如果选择转载则 将原视频链接贴这里
+	Dtime            int64          `json:"dtime"`              // 设置定时发布时间，时间戳，精确到秒，如不设置则立即发送
+	TID              int            `json:"tid"`                // 分类ID 必须
+	Tag              string         `json:"tag"`                // 标签 用逗号分隔 必须
+	DescFormatID     int            `json:"desc_format_id"`     // ？
+	Desc             string         `json:"desc"`               // 简介 必须
+	Recreate         int            `json:"recreate"`           // 二创视频 -1 不允许二创 1 允许二创
+	Dynamic          string         `json:"dynamic"`            // 粉丝动态 ？
+	Interactive      int            `json:"interactive"`        // 是否是合作视频 ？
+	Videos           []*SubmitVideo `json:"videos"`             // 视频 必须
+	ActReserveCreate int            `json:"act_reserve_create"` // 允许二创 ？
+	NoDisturbance    int            `json:"no_disturbance"`     // ？
+	NoReprint        int            `json:"no_reprint"`         // ？
 	Subtitle         struct {
 		Open int    `json:"open"`
 		Lan  string `json:"lan"`
@@ -717,4 +718,147 @@ type CreateRelationTagResponse struct {
 // LogoutResponse 登出
 type LogoutResponse struct {
 	RedirectUrl string `json:"redirectUrl"`
+}
+
+// CookieInfo ...
+type CookieInfo struct {
+	Refresh   bool  `json:"refresh"`
+	Timestamp int64 `json:"timestamp"`
+}
+
+// RefreshCookieResponse ...
+type RefreshCookieResponse struct {
+	Status       int    `json:"status"`
+	Message      string `json:"message"`
+	RefreshToken string `json:"refresh_token"`
+}
+
+// ExpReward 每日经验奖励状态
+type ExpReward struct {
+	Login        bool `json:"login"`         // 每日登陆 true 已完成 false 未完成 完成奖励5经验
+	Watch        bool `json:"watch"`         // 每日观看 true 已完成 false 未完成 完成奖励5经验
+	Coins        int  `json:"coins"`         // 每日投币所奖励的经验 上限50 注：该值更新存在延迟 大概延迟几秒钟
+	Share        bool `json:"share"`         // 每日分享 true 已完成 false 未完成 完成奖励5经验
+	Email        bool `json:"email"`         // 绑定邮箱 false 未完成 true 已完成 首次完成奖励20经验
+	Tel          bool `json:"tel"`           // 绑定手机号 false 未完成 true 已完成 首次完成奖励100经验
+	SafeQuestion bool `json:"safe_question"` // 设置密保问题 false 未完成 true 已完成 首次完成奖励30经验
+	IdentifyCard bool `json:"identify_card"` // 实名认证 false 未完成 true 已完成 首次完成奖励50经验
+}
+
+// TripleVideoResponse ...
+type TripleVideoResponse struct {
+	Like     bool `json:"like"`     // 是否点赞成功
+	Coin     bool `json:"coin"`     // 是否投币成功
+	Fav      bool `json:"fav"`      // 是否收藏成功
+	Multiply int  `json:"multiply"` // 投币数量
+}
+
+type Video struct {
+	Aid         int         `json:"aid"`       // avid
+	Videos      int         `json:"videos"`    // 分P总数
+	Tid         int         `json:"tid"`       // 分区ID
+	Tname       string      `json:"tname"`     // 子分区名称
+	Copyright   int         `json:"copyright"` // 视频类型 1 原创 2 转载
+	Pic         string      `json:"pic"`       // 封面url
+	Title       string      `json:"title"`     // 标题
+	Pubdate     int64       `json:"pubdate"`   // 发布时间 秒级时间戳
+	Ctime       int64       `json:"ctime"`     // 投稿时间 秒级时间戳
+	Desc        string      `json:"desc"`      // 简介
+	DescV2      []*DescV2   `json:"desc_v2"`   // 新版视频简介
+	State       int         `json:"state"`     // 状态
+	Duration    int         `json:"duration"`  // 所有分P总时长 单位秒
+	Rights      *Rights     `json:"rights"`    // 视频属性标志
+	Owner       *Owner      `json:"owner"`     // Up主信息
+	Stat        Stat        `json:"stat"`      // 视频状态数
+	Dynamic     string      `json:"dynamic"`   // 视频同步发布的的动态的文字内容
+	Cid         int64       `json:"cid"`       // 视频1P cid
+	Dimension   *Dimension  `json:"dimension"` // 视频1P分辨率
+	Pages       []*Page     `json:"pages"`     // 视频分P列表
+	ShortLink   string      `json:"short_link_v2"`
+	UpFromV2    int         `json:"up_from_v2"`
+	FirstFrame  string      `json:"first_frame"`
+	PubLocation string      `json:"pub_location"`
+	Bvid        string      `json:"bvid"` // bvid
+	SeasonType  int         `json:"season_type"`
+	IsOgv       bool        `json:"is_ogv"`
+	OgvInfo     interface{} `json:"ogv_info"`
+	EnableVt    int         `json:"enable_vt"`
+}
+
+type DescV2 struct {
+	RawText string `json:"raw_text"` // 简介内容 type=1时显示原文 type=2时显示'@'+raw_text+' '并链接至biz_id的主页
+	Type    int    `json:"type"`     // 类型 1：普通，2：@他人
+	BizId   int64  `json:"biz_id"`   // 被@用户的mid	=0，当type=1
+}
+
+type Rights struct {
+	Bp            int `json:"bp"`             // 是否允许承包
+	Elec          int `json:"elec"`           // 是否支持充电
+	Download      int `json:"download"`       // 是否允许下载
+	Movie         int `json:"movie"`          // 是否电影
+	Pay           int `json:"pay"`            // 是否PGC付费
+	Hd5           int `json:"hd5"`            // 是否有高码率
+	NoReprint     int `json:"no_reprint"`     // 是否显示“禁止转载”标志
+	Autoplay      int `json:"autoplay"`       // 是否自动播放
+	UgcPay        int `json:"ugc_pay"`        // 是否UGC付费
+	IsCooperation int `json:"is_cooperation"` // 是否为联合投稿
+	UgcPayPreview int `json:"ugc_pay_preview"`
+	NoBackground  int `json:"no_background"`
+	ArcPay        int `json:"arc_pay"`
+	PayFreeWatch  int `json:"pay_free_watch"`
+}
+
+type Owner struct {
+	Mid  int64  `json:"mid"`  // 用户 mid
+	Name string `json:"name"` // 用户名
+	Face string `json:"face"` // 用户头像
+}
+
+type Stat struct {
+	Aid      int64 `json:"aid"`      // avid
+	View     int   `json:"view"`     // 播放数
+	Danmaku  int   `json:"danmaku"`  // 弹幕数
+	Reply    int   `json:"reply"`    // 评论数
+	Favorite int   `json:"favorite"` // 收藏数
+	Coin     int   `json:"coin"`     // 投币数
+	Share    int   `json:"share"`    // 分享数
+	NowRank  int   `json:"now_rank"` // 当前排名
+	HisRank  int   `json:"his_rank"` // 历史最高排行
+	Like     int   `json:"like"`     // 点赞数
+	Dislike  int   `json:"dislike"`  // 点踩数 恒为0
+	Vt       int   `json:"vt"`
+	Vv       int   `json:"vv"`
+}
+
+type Dimension struct {
+	Width  int `json:"width"`  // 宽度
+	Height int `json:"height"` // 高度
+	Rotate int `json:"rotate"` // 是否将宽高对换 0 正常 1 对换
+}
+
+type Page struct {
+	Cid       int64      `json:"cid"`       // 分p cid
+	Page      int        `json:"page"`      // 分p序号
+	From      string     `json:"from"`      // 视频来源 vupload 普通上传 hunan 芒果TV qq 腾讯
+	Part      string     `json:"part"`      // 分P标题
+	Duration  int        `json:"duration"`  // 分P持续时间 单位秒
+	Vid       string     `json:"vid"`       // 站外视频vid
+	Weblink   string     `json:"weblink"`   // 站外视频跳转url
+	Dimension *Dimension `json:"dimension"` // 当前分P分辨率
+}
+
+// GetPopularVideoListResponse ...
+type GetPopularVideoListResponse struct {
+	List   []*Video `json:"list"`
+	NoMore bool     `json:"no_more"`
+}
+
+// GetLatestVideoResponse ...
+type GetLatestVideoResponse struct {
+	Archives []*Video `json:"archives"`
+	Page     struct {
+		Count int `json:"count"` // 总数
+		Num   int `json:"num"`   // 当前页码
+		Size  int `json:"size"`  // 每页项数
+	} `json:"page"`
 }
