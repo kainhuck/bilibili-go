@@ -409,6 +409,16 @@ func (c *Client) RefreshAuthInfo() error {
 	return nil
 }
 
+// LikeVideo 点赞视频
+func (c *Client) LikeVideo(id string) error {
+	return c.likeVideo(id, 1)
+}
+
+// UnLikeVideo 取消点赞
+func (c *Client) UnLikeVideo(id string) error {
+	return c.likeVideo(id, 2)
+}
+
 /* ===================== helper ===================== */
 
 func (c *Client) getHttpClient(auth bool) *net.HttpClient {

@@ -1218,6 +1218,7 @@ func (c *Client) AddCoins(id string, coins int) error {
 
 // ShareVideo 分享视频
 // id 视频ID av号或者bv号
+// 返回该视频的分享数
 func (c *Client) ShareVideo(id string) (int, error) {
 	uri := "https://api.bilibili.com/x/web-interface/share/add"
 
@@ -1245,4 +1246,34 @@ func (c *Client) ShareVideo(id string) (int, error) {
 	err = json.Unmarshal(baseResp.RawData(), &data)
 
 	return data, err
+}
+
+// likeVideo 点赞视频
+// id 视频ID av号或者bv号
+// like 1 点赞 2 取消点赞
+func (c *Client) likeVideo(id string, like int) error {
+	uri := "https://api.bilibili.com/x/web-interface/archive/like"
+
+	httpClient := c.getHttpClient(true).Post(uri)
+
+	if strings.HasPrefix(id, "BV") {
+		httpClient.AddParams("bvid", id)
+	} else {
+		httpClient.AddParams("aid", id)
+	}
+
+	var baseResp BaseResponse
+	err := httpClient.
+		AddParams("like", strconv.Itoa(like)).
+		AddParams("csrf", c.cookieCache["bili_jct"]).
+		EndStruct(&baseResp)
+	if err != nil {
+		return err
+	}
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return fmt.Errorf("%s", bts)
+	}
+
+	return nil
 }

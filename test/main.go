@@ -23,12 +23,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//count, err := client.ShareVideo("BV19u4y1D7GT")
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//
-	//fmt.Println("OK", count)
+	err := client.LikeVideo("BV19u4y1D7GT")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("OK")
 
 	printIt(client.GetExpReword())
 
