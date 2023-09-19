@@ -1341,6 +1341,7 @@ func (c *Client) HasLikeVideo(id string) (int, error) {
 }
 
 // TripleVideo 一键三连
+// id 视频ID av号或者bv号
 func (c *Client) TripleVideo(id string) (*TripleVideoResponse, error) {
 	uri := "https://api.bilibili.com/x/web-interface/archive/like/triple"
 
@@ -1365,6 +1366,33 @@ func (c *Client) TripleVideo(id string) (*TripleVideoResponse, error) {
 	}
 
 	rsp := &TripleVideoResponse{}
+	err = json.Unmarshal(baseResp.RawData(), &rsp)
+
+	return rsp, err
+}
+
+// GetPopularVideoList 获取热门视频列表
+// pn 页码
+// ps 每页项数
+// common true 展示非个性化的列表 false 展示个性化列表
+func (c *Client) GetPopularVideoList(pn int, ps int, common bool) (*GetPopularVideoListResponse, error) {
+	uri := "https://api.bilibili.com/x/web-interface/popular"
+
+	var baseResp BaseResponse
+	err := c.getHttpClient(!common).Get(uri).
+		AddParams("pn", strconv.Itoa(pn)).
+		AddParams("ps", strconv.Itoa(ps)).
+		EndStruct(&baseResp)
+	if err != nil {
+		return nil, err
+	}
+
+	if baseResp.Code != CodeSuccess {
+		bts, _ := json.Marshal(baseResp)
+		return nil, fmt.Errorf("%s", bts)
+	}
+
+	rsp := &GetPopularVideoListResponse{}
 	err = json.Unmarshal(baseResp.RawData(), &rsp)
 
 	return rsp, err

@@ -179,7 +179,7 @@ func (c *Client) Logout() (string, error) {
 }
 
 // UploadVideoFromDisk 从本地磁盘上传视频 videoPath 视频路径
-func (c *Client) UploadVideoFromDisk(videoPath string) (*Video, error) {
+func (c *Client) UploadVideoFromDisk(videoPath string) (*SubmitVideo, error) {
 	fileInfo, err := os.Stat(videoPath)
 	if err != nil {
 		return nil, err
@@ -194,7 +194,7 @@ func (c *Client) UploadVideoFromDisk(videoPath string) (*Video, error) {
 }
 
 // UploadVideoFromReader ...
-func (c *Client) UploadVideoFromReader(filename string, reader io.Reader) (*Video, error) {
+func (c *Client) UploadVideoFromReader(filename string, reader io.Reader) (*SubmitVideo, error) {
 	content, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
@@ -204,7 +204,7 @@ func (c *Client) UploadVideoFromReader(filename string, reader io.Reader) (*Vide
 }
 
 // UploadVideoFromHTTP 从http链接上传文件
-func (c *Client) UploadVideoFromHTTP(filename string, url string) (*Video, error) {
+func (c *Client) UploadVideoFromHTTP(filename string, url string) (*SubmitVideo, error) {
 	c.logger.Infof("start download file: %v, from: %v", filename, url)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -216,7 +216,7 @@ func (c *Client) UploadVideoFromHTTP(filename string, url string) (*Video, error
 }
 
 // UploadVideo 视频上传，filename 文件名 content 视频内容
-func (c *Client) UploadVideo(filename string, content []byte) (*Video, error) {
+func (c *Client) UploadVideo(filename string, content []byte) (*SubmitVideo, error) {
 	filesize := int64(len(content))
 	// 调接口上传
 	// 1. 预上传
@@ -277,7 +277,7 @@ func (c *Client) UploadVideo(filename string, content []byte) (*Video, error) {
 
 	c.logger.Infof("video upload finished success，cid: %v", preResp.BizID)
 
-	return &Video{
+	return &SubmitVideo{
 		Filename: preResp.Filename(),
 		Title:    strings.Split(filename, ".")[0],
 		Desc:     "",

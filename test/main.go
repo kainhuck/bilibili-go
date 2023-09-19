@@ -23,14 +23,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err := client.UnLikeVideo("BV19u4y1D7GT")
+	//err := client.UnLikeVideo("BV19u4y1D7GT")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//
+	//fmt.Println("OK")
+	//
+	//printIt(client.GetExpReword())
+
+	resp, err := client.GetPopularVideoList(1, 10, false)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println("OK")
-
-	printIt(client.GetExpReword())
+	for _, each := range resp.List {
+		fmt.Println(each.Bvid, each.Title, each.Stat.View)
+	}
 
 	//printIt(client.GetFriends())
 	//tags, err := client.GetRelationTags()
@@ -79,7 +87,7 @@ func SubmitVideo(client *bilibili_go.Client) {
 		Tag:       "郊游",
 		Desc:      "我们一起去郊游吧",
 		Recreate:  -1,
-		Videos: []*bilibili_go.Video{
+		Videos: []*bilibili_go.SubmitVideo{
 			video,
 		},
 		NoReprint: 1,
