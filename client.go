@@ -372,7 +372,7 @@ func (c *Client) RefreshAuthInfo() error {
 		return nil
 	}
 
-	c.logger.Debug("refresh auth info")
+	c.logger.Info("refresh auth info")
 
 	oldRefreshToken := c.authInfo.RefreshToken
 

@@ -19,6 +19,10 @@ func main() {
 	)
 	client.LoginWithQrCode()
 
+	if err := client.RefreshAuthInfo(); err != nil {
+		log.Fatal(err)
+	}
+
 	printIt(client.GetMyInfo())
 
 	//printIt(client.GetFriends())
